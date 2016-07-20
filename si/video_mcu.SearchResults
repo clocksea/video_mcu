@@ -1,0 +1,3 @@
+---- AIN15 Matches (2 in 1 files) ----
+Hw_sysctl.h (inc):#define SYSCTL_DC8_ADC1AIN15    0x80000000  // ADC Module 1 AIN15 Pin Present
+Hw_sysctl.h (inc):#define SYSCTL_DC8_ADC0AIN15    0x00008000  // ADC Module 0 AIN15 Pin Present
