@@ -93,72 +93,14 @@ int atoi(const char *str)
 	 return total * sign;                      //返还所得到的整数，加入符号
 }
 
-/*通用串口发送函数，例如向电台发送命令*/
-void uart_send_datas(unsigned long uart_base,radio_uart_t *uart_data,char *data_2_send)
-{
-	unsigned short i, len;
-	strcpy(uart_data->com_tx_buf,data_2_send);
-	
-    //UARTprintf("uart_data->com_tx_buf = %s\n\r",uart_data->com_tx_buf);//调试
-	
-	while(uart_data->com_send_ready_flg == FALSE);
-	
-	uart_data->com_tx_len = len = strlen(data_2_send);
-	if(len >= UART_BYE_FIFO)  len = UART_BYE_FIFO;
-	for(i=0; i< len; i++)
-	{
-		UARTCharPutNonBlocking(uart_base, uart_data->com_tx_buf[i]);
-	} 
-    
-	uart_data->com_tx_sequence = len;
-	uart_data->com_send_ready_flg = FALSE;   	
-}
 
-
-
-/*处理POTS?命令读出来的数据*/
-static void handle_cmd_pots_query(const char *buf, unsigned char len)
-{
-	read_tx_power_setting=0;
-	read_tx_ref_osci=0;
-	//UARTprintf("POTS命令查询结果 = PT,%s\n\r", buf);
-	
-	while(*buf != ',')
-	{
-	        if(((*buf >'9')||(*buf <'0'))&&(*buf != ' '))
-			{
-			  UARTprintf("Wrong PT 1!\n\r");
-			  return;
-	        }
-        	read_tx_power_setting = read_tx_power_setting * 10 + (*buf++ - '0');
-	}
-	buf++;
-	while(*buf != ',')
-	{
-	       if(((*buf >'9')||(*buf <'0'))&&(*buf != ' '))
-		   {
-			  UARTprintf("Wrong PT 2!\n\r");
-			  return;
-	       }
-           read_tx_ref_osci = read_tx_ref_osci * 10 + (*buf++ - '0');
-	}
-
-	if (1 == flag_query_cops)
-	{
-		flag_query_cops = 0;
-		return;
-	}
-
-	flag_ready = 1;
-	
-}
 
 /***************************************************************/
 /*920 UART发送中断服务程序*/
 void UART_920_tx_isr(void)
 {
 	unsigned char i, len;
-	
+#if 0
 	if (g_uart_dbg.com_send_ready_flg == FALSE)
 	{
 		if (g_uart_dbg.com_tx_len == g_uart_dbg.com_tx_sequence)
@@ -177,12 +119,14 @@ void UART_920_tx_isr(void)
 			g_uart_dbg.com_tx_sequence += len;
 		}
 	}
+#endif 
 }
 
 /***************************************************************/
 /*920 UART接收中断服务程序*/
 void UART_920_rx_isr(void)
 {
+#if 0
       unsigned char tmp;
       unsigned short tail;
 	while (UARTCharsAvail(uart_for_920))                            //若接收FIFO中有可用数据
@@ -202,6 +146,7 @@ void UART_920_rx_isr(void)
 
 
 	}
+#endif
 }
 
 /***************************************************************/

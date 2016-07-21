@@ -1,49 +1,9 @@
-/********************************************************************
-版权所有	：Copyright (C) 2011 承联通信
-文件名字	：ccu串口命令解析
-文件功能	：ccu串口命令解析
-创建日期	：2011-06-09
-创建人		：ZhongH
-修改标识	：
-修改描述	：
-*********************************************************************/
+
 #include "includes.h"
 
-#define CMD_TYPE_SEND_MIDLEV      0x01                       /*配置发射信号中心电平*/
-#define CMD_TYPE_SEND_RANGE       0x02                       /*配置发射信号幅度*/
-#define CMD_TYPE_BALANCE_MOD1   0x03                       /*配置电台平衡mod1*/
-#define CMD_TYPE_BALANCE_MOD2   0x04                       /*配置电台平衡mod2*/
-#define CMD_TYPE_SEND_REF_OSCI_LEV         0x05         /*配置电台发射晶振参数电平*/
-#define CMD_TYPE_SEND_REF_POWER_LEV      0x06        /*配置电台发射功率参数电平*/
-#define CMD_TYPE_RECEIVE_NARROW_BAND    0x07        /*配置电台接受宽窄带*/
-#define CMD_TYPE_PRINT_ALL_SEND_FREG      0x08        /*打印当前发射频率的所有参数*/
-#define CMD_TYPE_PRINT_ALL_RECEIVE_FREG 0x09         /*打印当前接受的所有频率*/
-#define CMD_TYPE_PRINT_ALL_PARAM  0x0A                   /*打印当前所有参数*/
-#define CMD_TYPE_SET_RANGE_FREG   0x0B                    /*设置频率范围*/
-#define CMD_TYPE_SAVE_CURRENT_PUB_PARAM      0x0C/*保存当前公共参数*/
-#define CMD_TYPE_SAVE_CURRENT_SEND_FREG      0x0D /*保存当前发射参数*/
-#define CMD_TYPE_SAVE_CURRENT_RECEIVE_FREG 0x0E /*保存当前接受频率参数*/
-#define CMD_TYPE_DEL_ASSIGN_SEND_FREG          0x0F  /*删除当前发射频率参数*/
-#define CMD_TYPE_TX_RX_POWER                            0x10 /*仅配置电台发射频率，接收频率和发射功率*/
-#define CMD_TYPE_SET_PT                                       0x11 /*仅配置电台平衡参数*/
-#define CMD_TYPE_READ_MCU_VERSION                  0x12 /*读MCU软件版本*/
-#define CMD_TYPE_POTS_QUERY                              0x13 /*读取电台平衡参数*/
 
-#define CMD_TYPE_RECV_RANGE       0x14                       /*配置接收信号幅度*/
-#define CMD_TYPE_RECV_MIDLEV      0x15                       /*配置接收信号中心电平*/
 
-#define CMD_TYPE_SET_PLL			0x16					/*配置PLL芯片*/
-
-#define CMD_TYPE_WRITE_SN				0X17/*设置SN*/
-#define CMD_TYPE_READ_SN				0X18/*读取SN*/
-
-#define CMD_TYPE_WATCGDOG_DBG			0x19
-
-#define CMD_CH    (1)
-#define CMD_CFG  (2)
-#define CMD_CCH (3)
-
-char *mcusoft_version = "V1.1.3.6-2016-5-9";          //MCU软件版本号
+char *mcusoft_version = "V1.0.0.0-20160721";          //MCU软件版本号
 
 ccu_pc_buf_t ccu_pc_buf;
 uart_buf_t ccu_uart_buf;
@@ -87,7 +47,60 @@ void init_ccu_uart(void)
 	ccu_uart_buf.com_tx_sequence = 0;	
 }
 
-void __pll_reg0_set(uint32_t ch, uint32_t reg, uint32_t )
+void __pll_reg0_set(uint32_t ch, uint32_t reg, uint32_t int_value, uint32_t frac)
+{
+	uint32_t value;
+
+	value = ((int_value & 0x3FFF) << 15) + ((frac & 0xFFF) << 3) + (reg&0x7);
+}
+
+void __pll_reg1_set(uint32_t ch, uint32_t reg, uint32_t adj, uint32_t prescaler, uint32_t phase, uint32_t mod)
+{
+	uint32_t value;
+
+	value = ((adj&1) << 28) + ((prescaler&1) << 27) + ((phase&0xFFF) << 15) + ((mod&0xFFF) << 3) + (reg&0x7);
+}
+
+void __pll_reg2_set(uint32_t ch, uint32_t reg, uint32_t noise_mode, uint32_t muxout, uint32_t reference_double, uint32_t reference_div_by_2,
+						uint32_t r_count, uint32_t double_buffer, uint32_t charge_pump, uint32_t ldf, uint32_t ldp, uint32_t pd, uint32_t power_down, 
+						uint32_t cp, uint32_t counter_reset)
+{
+	uint32_t value;
+
+	value = ((noise_mode&0x3) << 29) + ((muxout&0x7) << 26) + ((reference_double&1) << 25) + ((reference_div_by_2&1) << 24) +
+			((r_count&0x3FF) << 14) + ((double_buffer&1) << 13) + ((charge_pump&0xF) << 9) + ((ldf&1) << 8) +
+			((ldp&1) << 7) + ((pd&1) << 6) + ((power_down&1) << 5) + ((cp&1) << 4) + ((counter_reset&1) << 3) + (reg&0x7);
+}
+void __pll_reg3_set(uint32_t ch, uint32_t reg, uint32_t band_select, uint32_t abp, uint32_t charge_cancelation, uint32_t csr, uint32_t clk_div_mode, 
+						uint32_t clk_div_value)
+{
+	uint32_t value;
+	
+	value = ((band_select&1) << 23) + ((abp&1) << 22) + ((charge_cancelation&1) << 21) + ((csr&1) << 18) + 
+			((clk_div_mode&3) << 15) + ((clk_div_value&0xFFF) << 3) + (reg&0x7);
+
+}
+void __pll_reg4_set(uint32_t ch, uint32_t reg, uint32_t feed_back_select, uint32_t rf_div_select, uint32_t band_select_clk_div, uint32_t vco_power_down,
+						uint32_t mtld, uint32_t aux_output_select, uint32_t aux_out, uint32_t aux_output_power, uint32_t rf_out, uint32_t output_power)
+{
+	uint32_t value;
+
+	value = ((feed_back_select&1) << 23) + ((rf_div_select&7) << 20) + ((band_select_clk_div&0xFF) << 12) + ((vco_power_down&1) << 11) + 
+			((mtld&1) << 10) + ((aux_output_select&1) << 9) + ((aux_out&1) << 8) + ((aux_output_power&3) << 6) +
+			((rf_out&1) << 5) + ((output_power&3) << 3) + (reg&0x7);
+
+}
+
+void __pll_reg5_set(uint32_t ch, uint32_t reg, uint32_t ld_pin_mode)
+{
+	uint32_t value;
+
+	value = ((ld_pin_mode&3) << 22) + (reg&0x7);
+
+}
+
+
+
 
 
 void proc_SMFREQ_cmd(char *buf, unsigned char len)
@@ -101,7 +114,7 @@ void proc_SSFREQ_cmd(char *buf, unsigned char len)
 }
 void proc_PLLSET_cmd(char *buf, unsigned char len)
 {
-	uint32_t param[10];
+	uint32_t param[64];
 	uint32_t cnt=0;
 	char *cmd = buf + strlen("AT+PLLSET=");
 
@@ -141,16 +154,23 @@ DONE:
 	switch(param[1])
 	{
 		case 0:
+			__pll_reg0_set(param[0],param[1],param[2],param[3]);
 			break;
 		case 1:
+			__pll_reg1_set(param[0],param[1],param[2],param[3],param[4],param[5]);
 			break;
 		case 2:
+			__pll_reg2_set(param[0],param[1],param[2],param[3],param[4],param[5],param[6],param[7],param[8],param[9],param[10],param[11],
+							param[12],param[13],param[14]);
 			break;
 		case 3:
+			__pll_reg3_set(param[0],param[1],param[2],param[3],param[4],param[5],param[6],param[7]);
 			break;
 		case 4:
+			__pll_reg4_set(param[0],param[1],param[2],param[3],param[4],param[5],param[6],param[7],param[8],param[9],param[10],param[11]);
 			break;
 		case 5:
+			__pll_reg5_set(param[0],param[1],param[2]);
 			break;
 		default:
 			UARTprintf("input error,%s\n\r",buf);
@@ -275,7 +295,7 @@ void proc_uart_buf(uart_info_t *uart)
 				{
 					uart->stream_state=STATE_IDLE;
 					uart->com_rx_buf[uart->com_rx_sequence++] = c;
-					proc_uart_cmd(flag_cmd, uart->com_rx_buf, uart->com_rx_sequence);
+					proc_uart_cmd(uart->com_rx_buf, uart->com_rx_sequence);
 				}
 				else
 				{
@@ -289,25 +309,6 @@ void proc_uart_buf(uart_info_t *uart)
 	}
 }
 
-//CCU/PC UART接收中断服务程序
-void UART_CCU_rx_isr(void)
-{
-	while (UARTCharsAvail(uart_for_ccu))
-	{
-		ccu_uart_buf.ring_buf[ccu_uart_buf.ring_tail] = (unsigned char)UARTCharGetNonBlocking(uart_for_ccu);	
-		ccu_uart_buf.ring_tail = (ccu_uart_buf.ring_tail + 1) % MAX_COM_RING_PACKSIZE;
-	}
-}
 
-//UART1中断服务程序
-void UART1IntHandler(void)                             
-{
-    unsigned long ulStatus;
-    ulStatus = UARTIntStatus(UART1_BASE, true);                   //读取中断状态
-    UARTIntClear(UART1_BASE, ulStatus);                              //清除中断状态     
-
-	if (ulStatus&UART_INT_RX || ulStatus&UART_INT_RT)       //接收中断或接收超时中断
-		UART_CCU_rx_isr();
-}
 
 

@@ -218,20 +218,7 @@ void timer1AIntHandler(void)
 
 	if (ulStatus & TIMER_TIMA_TIMEOUT)                               //timer0A超时中断
 	{
-		++c_timer;
-                //UARTprintf("\nc_timer = %d\n\r", c_timer);	//调试
-		//if(c_timer - cch_count >= 8)	//如果心跳间隔大于8s 
-		
-		if(c_timer - cch_count >= 30)	//如果心跳间隔大于30s 	//调试
-		{
-                  //UARTprintf("\n超时心跳 = %d\n\r",c_timer - cch_count );	//调试
-			heart_flag = 0;				//
-		}
 
-		if(c_timer > 3000)			//防止计数溢出
-		{
-			c_timer = 0;
-		}
 				
 	}
 }
@@ -251,6 +238,7 @@ void timer3Init()
 
 void timer3AIntHandler(void)  
 {
+#if 0  
     unsigned long ulStatus;
     char buf[32] = {0};
     ulStatus = TimerIntStatus(TIMER3_BASE, true);                 //读取中断状态
@@ -268,6 +256,7 @@ void timer3AIntHandler(void)
     {
         TimerDisable(TIMER3_BASE, TIMER_A);      
     }
+#endif    
 }
 
 

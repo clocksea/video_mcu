@@ -6,22 +6,24 @@
 #include <string.h>
 
 
-#include "inc/hw_types.h"
-#include "inc/hw_ints.h"
-#include "inc/hw_memmap.h"
-#include "inc/hw_gpio.h"
-#include "driverlib/debug.h"
-#include "driverlib/gpio.h"
-#include "driverlib/sysctl.h"
-#include "driverlib/uart.h"
-#include "driverlib/flash.h"
-#include "driverlib/interrupt.h"
-#include "driverlib/I2c.h"
-#include "utils/uartstdio.h"
-#include "driverlib/Timer.h"
+#include "hw_types.h"
+#include "hw_ints.h"
+#include "hw_memmap.h"
+#include "hw_gpio.h"
+#include "debug.h"
+#include "gpio.h"
+#include "sysctl.h"
+#include "uart.h"
+#include "flash.h"
+#include "interrupt.h"
+#include "I2c.h"
+#include "uartstdio.h"
+#include "Timer.h"
 #include "radio.h"
 #include "920_uart.h"
 #include "PLL.h"
+#include "i2s.h"
+#include "adc.h"
 
 #define  FLASH_BASE_ADDR (0x1FC00)
 
@@ -30,9 +32,7 @@ extern void init_software(void);                       //定义于ccu_uart.c文件中
 extern void init_ccu_uart(void);
 extern void proc_ccu_uart_buf(void);
 extern void timer1Init(void);
-extern int32_t recv_radio_hbreq(radio_uart_t *data, int32_t *alarm, int32_t *tx_freq, int32_t *rx_freq, int32_t *tx_pwr, unsigned char *band);	//调试
-extern unsigned int c_timer;
-extern unsigned int cch_count;
+
 extern unsigned CCH_flag;
 extern int heart_flag;
 extern int alarm_flag;

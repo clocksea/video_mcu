@@ -91,8 +91,6 @@ extern int PT_DG_flag ;
 
 /************************/
 
-extern radio_uart_t  g_uart_dbg;
-
 /*数据结构初始化*/
 extern void init_radio_uart(void);
 
@@ -126,7 +124,6 @@ extern void cmd_DIAGM_que(void);
 extern void cmd_DIAG1_que(void);
 extern void cmd_DIAG0_que(void);      //关闭
 static void handle_cmd_DIAG1(const char *buf, unsigned char len);
-extern void uart_send_datas(unsigned long uart_base,radio_uart_t *uart_data,char *data_2_send);	//向电台发送数据
 
 extern void UART_920_tx_isr(void);	//920 UART发送中断服务程序
 extern void UART_920_rx_isr(void);	//920 UART接收中断服务程序
