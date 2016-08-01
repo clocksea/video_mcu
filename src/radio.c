@@ -15,7 +15,7 @@ extern char g_mx920_info[256];
 extern char *mcusoft_version;
 cur_param_t  cur_param;
 radio_param_t radio_param;
-extern radio_version_info_t g_radio_station; 
+
 uint32_t radio_strlen(char *s)
 {
 	uint32_t i;
@@ -295,22 +295,7 @@ void proc_CFG_set_range_freg(char *buf)    //0B
 /*打印所有参数*/
 void proc_CFG_prin_all_param()      //0A
 {
-	memcpy(&radio_param,(void *)FLASH_BASE_ADDR,sizeof(radio_param)); 
-	
-	UARTprintf("所有参数打印如下\n");
-	UARTprintf("MCU软件版本号 = %s\n", mcusoft_version);	
-	UARTprintf("信道机信息:%s,类型:0x%x(MX920-0x10,MX930-0x11)\n",g_mx920_info,g_radio_station.mx9xx);	
-	UARTprintf("频率范围: %u ~ %u\n", radio_param.freq_range.start_freq, radio_param.freq_range.end_freq);
-	UARTprintf("当前参数: 发射频率%u, 接收频率%u, 发射功率%u\n", cur_param.tx_freq, cur_param.rx_freq, cur_param.power);
-	//UARTprintf("公共参数: 发射晶振参数电平%u, 发射功率参考电平%u\n", radio_param.pm.tx_ref_osci, radio_param.pm.tx_power_setting);
-	UARTprintf("接收参数: 接收信号中心电平%u, 接收信号幅度%u\n", radio_param.rx_parm.midlvl, radio_param.rx_parm.range);
-	UARTprintf("tx_parm[0]: 发射频率%u, 发射信号中心电平%u, 发射信号幅度%u, 电台平衡参数mod(1)%u, 电台平衡参数mod(2)%u\n", 
-		radio_param.tx_parm[0].freq, radio_param.tx_parm[0].midlvl, radio_param.tx_parm[0].range, radio_param.tx_parm[0].mod1, radio_param.tx_parm[0].mod2);
-	UARTprintf("tx_parm[1]: 发射频率%u, 发射信号中心电平%u, 发射信号幅度%u, 电台平衡参数mod(1)%u, 电台平衡参数mod(2)%u\n", 
-		radio_param.tx_parm[1].freq, radio_param.tx_parm[1].midlvl, radio_param.tx_parm[1].range, radio_param.tx_parm[1].mod1, radio_param.tx_parm[1].mod2);
-	UARTprintf("tx_parm[2]: 发射频率%u, 发射信号中心电平%u, 发射信号幅度%u, 电台平衡参数mod(1)%u, 电台平衡参数mod(2)%u\n", 
-		radio_param.tx_parm[2].freq, radio_param.tx_parm[2].midlvl, radio_param.tx_parm[2].range, radio_param.tx_parm[2].mod1, radio_param.tx_parm[2].mod2);
-	UARTprintf("SN:%s\n", radio_param.SN);	
+
 }
 
 /*打印当前接收频率的所有参数*/

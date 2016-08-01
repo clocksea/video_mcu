@@ -2,54 +2,47 @@
 
 <Workspace>
   <ConfigDictionary>
-    <CurrentConfigs>
-      <Project>video_mcu/Debug</Project>
-      <Project>radio_audio_if/Debug</Project>
-    </CurrentConfigs>
-    <CurrentProj>video_mcu</CurrentProj>
-    <OverviewSelected>0</OverviewSelected>
-  </ConfigDictionary>
+    
+    
+    
+  <CurrentConfigs><Project>video_mcu/Debug</Project><Project>radio_audio_if/Debug</Project></CurrentConfigs><CurrentProj>video_mcu</CurrentProj><OverviewSelected>0</OverviewSelected></ConfigDictionary>
   <Desktop>
     <Static>
       <Workspace>
         <ColumnWidths>
-          <Column0>189</Column0>
-          <Column1>27</Column1>
-          <Column2>27</Column2>
-          <Column3>27</Column3>
-        </ColumnWidths>
+          
+          
+          
+          
+        <Column0>189</Column0><Column1>27</Column1><Column2>27</Column2><Column3>27</Column3></ColumnWidths>
       </Workspace>
       <Build>
-        <ColumnWidth0>20</ColumnWidth0>
-        <ColumnWidth1>1392</ColumnWidth1>
-        <ColumnWidth2>371</ColumnWidth2>
-        <ColumnWidth3>92</ColumnWidth3>
-      </Build>
-    </Static>
+        
+        
+        
+        
+      <ColumnWidth0>20</ColumnWidth0><ColumnWidth1>1392</ColumnWidth1><ColumnWidth2>371</ColumnWidth2><ColumnWidth3>92</ColumnWidth3></Build>
+      <Debug-Log>
+        
+        
+      <ColumnWidth0>18</ColumnWidth0><ColumnWidth1>1859</ColumnWidth1></Debug-Log>
+    <TerminalIO/></Static>
     <Windows>
-      <Wnd2>
+      
+      
+    <Wnd0>
         <Tabs>
           <Tab>
             <Identity>TabID-23976-24477</Identity>
             <TabName>Workspace</TabName>
             <Factory>Workspace</Factory>
             <Session>
-              <NodeDict>
-                <ExpandedNode>radio_audio_if</ExpandedNode>
-                <ExpandedNode>radio_audio_if/Output</ExpandedNode>
-                <ExpandedNode>radio_audio_if/lib</ExpandedNode>
-                <ExpandedNode>radio_audio_if/src</ExpandedNode>
-                <ExpandedNode>radio_audio_if/startup</ExpandedNode>
-                <ExpandedNode>video_mcu</ExpandedNode>
-                <ExpandedNode>video_mcu/src</ExpandedNode>
-                <ExpandedNode>video_mcu/startup</ExpandedNode>
-              </NodeDict>
-            </Session>
+              
+            <NodeDict><ExpandedNode>radio_audio_if</ExpandedNode><ExpandedNode>radio_audio_if/Output</ExpandedNode><ExpandedNode>radio_audio_if/lib</ExpandedNode><ExpandedNode>radio_audio_if/src</ExpandedNode><ExpandedNode>radio_audio_if/startup</ExpandedNode><ExpandedNode>video_mcu</ExpandedNode><ExpandedNode>video_mcu/src</ExpandedNode><ExpandedNode>video_mcu/startup</ExpandedNode></NodeDict></Session>
           </Tab>
         </Tabs>
-        <SelectedTab>0</SelectedTab>
-      </Wnd2>
-      <Wnd3>
+        
+      <SelectedTab>0</SelectedTab></Wnd0><Wnd1>
         <Tabs>
           <Tab>
             <Identity>TabID-7665-25806</Identity>
@@ -57,84 +50,28 @@
             <Factory>Build</Factory>
             <Session/>
           </Tab>
+          <Tab>
+            <Identity>TabID-31631-572</Identity>
+            <TabName>Debug Log</TabName>
+            <Factory>Debug-Log</Factory>
+            <Session/>
+          </Tab>
         </Tabs>
-        <SelectedTab>0</SelectedTab>
-      </Wnd3>
-    </Windows>
+        
+      <SelectedTab>0</SelectedTab></Wnd1></Windows>
     <Editor>
-      <Pane/>
-      <ActivePane>0</ActivePane>
-      <Sizes>
-        <Pane>
-          <X>1000000</X>
-          <Y>1000000</Y>
-        </Pane>
-      </Sizes>
-      <SplitMode>1</SplitMode>
-    </Editor>
+      
+      
+      
+      
+    <Pane><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\src\my_uart.c</Filename><XPos>0</XPos><YPos>156</YPos><SelStart>3981</SelStart><SelEnd>3981</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\src\includes.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>336</SelStart><SelEnd>336</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\src\cmd_proc.c</Filename><XPos>0</XPos><YPos>87</YPos><SelStart>3285</SelStart><SelEnd>3285</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\src\PLL.c</Filename><XPos>0</XPos><YPos>143</YPos><SelStart>4208</SelStart><SelEnd>4208</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\src\radio.c</Filename><XPos>0</XPos><YPos>62</YPos><SelStart>2031</SelStart><SelEnd>2031</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\src\startup_ewarm.c</Filename><XPos>0</XPos><YPos>176</YPos><SelStart>8837</SelStart><SelEnd>8837</SelEnd></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\src\main.c</Filename><XPos>0</XPos><YPos>465</YPos><SelStart>15018</SelStart><SelEnd>15018</SelEnd></Tab><ActiveTab>6</ActiveTab></Pane><ActivePane>0</ActivePane><Sizes><Pane><X>1000000</X><Y>1000000</Y></Pane></Sizes><SplitMode>1</SplitMode></Editor>
     <Positions>
-      <Top>
-        <Row0>
-          <Sizes>
-            <Toolbar-004fb5f0>
-              <key>iaridepm.enu1</key>
-            </Toolbar-004fb5f0>
-          </Sizes>
-        </Row0>
-      </Top>
-      <Left>
-        <Row0>
-          <Sizes>
-            <Wnd2>
-              <Rect>
-                <Top>-2</Top>
-                <Left>-2</Left>
-                <Bottom>531</Bottom>
-                <Right>263</Right>
-                <x>-2</x>
-                <y>-2</y>
-                <xscreen>200</xscreen>
-                <yscreen>200</yscreen>
-                <sizeHorzCX>104167</sizeHorzCX>
-                <sizeHorzCY>204082</sizeHorzCY>
-                <sizeVertCX>138021</sizeVertCX>
-                <sizeVertCY>543878</sizeVertCY>
-              </Rect>
-            </Wnd2>
-          </Sizes>
-        </Row0>
-      </Left>
-      <Right>
-        <Row0>
-          <Sizes/>
-        </Row0>
-      </Right>
-      <Bottom>
-        <Row0>
-          <Sizes>
-            <Wnd3>
-              <Rect>
-                <Top>-2</Top>
-                <Left>-2</Left>
-                <Bottom>401</Bottom>
-                <Right>1922</Right>
-                <x>-2</x>
-                <y>-2</y>
-                <xscreen>1924</xscreen>
-                <yscreen>403</yscreen>
-                <sizeHorzCX>1002083</sizeHorzCX>
-                <sizeHorzCY>411224</sizeHorzCY>
-                <sizeVertCX>104167</sizeVertCX>
-                <sizeVertCY>204082</sizeVertCY>
-              </Rect>
-            </Wnd3>
-          </Sizes>
-        </Row0>
-      </Bottom>
-      <Float>
-        <Sizes/>
-      </Float>
-    </Positions>
+      
+      
+      
+      
+      
+    <Top><Row0><Sizes><Toolbar-003070b8><key>iaridepm.enu1</key></Toolbar-003070b8></Sizes></Row0><Row1><Sizes/></Row1></Top><Left><Row0><Sizes><Wnd0><Rect><Top>-2</Top><Left>-2</Left><Bottom>531</Bottom><Right>263</Right><x>-2</x><y>-2</y><xscreen>200</xscreen><yscreen>200</yscreen><sizeHorzCX>104167</sizeHorzCX><sizeHorzCY>204082</sizeHorzCY><sizeVertCX>138021</sizeVertCX><sizeVertCY>543878</sizeVertCY></Rect></Wnd0></Sizes></Row0></Left><Right><Row0><Sizes/></Row0></Right><Bottom><Row0><Sizes><Wnd1><Rect><Top>-2</Top><Left>-2</Left><Bottom>401</Bottom><Right>1922</Right><x>-2</x><y>-2</y><xscreen>1924</xscreen><yscreen>403</yscreen><sizeHorzCX>1002083</sizeHorzCX><sizeHorzCY>411224</sizeHorzCY><sizeVertCX>104167</sizeVertCX><sizeVertCY>204082</sizeVertCY></Rect></Wnd1></Sizes></Row0></Bottom><Float><Sizes/></Float></Positions>
   </Desktop>
 </Workspace>
 

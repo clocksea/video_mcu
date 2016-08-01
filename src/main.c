@@ -1,27 +1,15 @@
 
 #include "includes.h"
 
-#define  LED_PERIPH             SYSCTL_PERIPH_GPIOA
-#define  LED_PORT                GPIO_PORTA_BASE
-#define  LED_PIN                  GPIO_PIN_6
-#define BRD_VER_PINS		GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6 | GPIO_PIN_7
-//#define  FUN_TURE 1
-//#define  FUN_FALSE 0
+
+
+
 
 unsigned int c_timer;
 int heart_flag;
 int alarm_flag;	//电台告警标志位，由IO 中断置位
 int	alarm_count;//alarm_status 发送次数
-
-unsigned int board_ver = 0x1;	//PCB 版本标志，0xF代表V4及以下版本，0x1代表V5及V6版本
-unsigned long uart_for_ccu = UART0_BASE;
-unsigned long uart_for_920 = UART1_BASE;
-unsigned int UARTStdio_port_num = 1;
-
-char RPM[32];
-int Ta,Tb;
-
-
+ 
 int32_t watchdog_cnt=0;
 
 
@@ -142,14 +130,76 @@ void iis_init(void)
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_I2S0);               //使能iis0模块  
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);            //使能iis0所在的GPIO端口
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);            //使能iis0所在的GPIO端口
+	SysCtlI2SMClkSet(0, 48000 * 32 * 2 * 4);
+	
 	GPIOPinConfigure(GPIO_PD6_I2S0TXSCK);                       
 	GPIOPinConfigure(GPIO_PF0_I2S0TXSD);  
 	GPIOPinTypeI2S(GPIO_PORTD_BASE,GPIO_PIN_6); 
 	GPIOPinTypeI2S(GPIO_PORTF_BASE,GPIO_PIN_0);
-	I2SMasterClockSelect(I2S0_BASE,I2S_TX_MCLK_INT|I2S_RX_MCLK_INT);
+	
+	I2SMasterClockSelect(I2S0_BASE,I2S_TX_MCLK_INT);
 	I2STxConfigSet(I2S0_BASE,I2S_CONFIG_FORMAT_I2S|I2S_CONFIG_SCLK_INVERT|I2S_CONFIG_MODE_MONO|I2S_CONFIG_CLK_MASTER
 							 |I2S_CONFIG_SAMPLE_SIZE_32|I2S_CONFIG_WIRE_SIZE_32|I2S_CONFIG_EMPTY_ZERO);
 }
+
+
+void pll_gpio_init(void)
+{
+	SysCtlPeripheralEnable(PLLLE_1_PERIPH);                      
+	GPIOPinTypeGPIOOutput(PLLLE_1_PORT, PLLLE_1_PIN);       
+	//GPIOPinWrite(PLLLE_1_PORT, PLLLE_1_PIN, 0x00);
+	GPIOPinWrite(PLLLE_1_PORT, PLLLE_1_PIN, 0x02);
+
+	SysCtlPeripheralEnable(PLLCE_1_PERIPH);                      
+	GPIOPinTypeGPIOOutput(PLLCE_1_PORT, PLLCE_1_PIN);       
+	GPIOPinWrite(PLLCE_1_PORT, PLLCE_1_PIN, 0x01);
+
+	SysCtlPeripheralEnable(PLLPDBRF_1_PERIPH);                      
+	GPIOPinTypeGPIOOutput(PLLPDBRF_1_PORT, PLLPDBRF_1_PIN);       
+	GPIOPinWrite(PLLPDBRF_1_PORT, PLLPDBRF_1_PIN, 0x40);	
+}
+
+
+void ssi0_init(void)
+{
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_SSI0);	
+	
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);	
+	
+	GPIOPinConfigure(GPIO_PA2_SSI0CLK);
+	GPIOPinConfigure(GPIO_PA4_SSI0RX);
+	GPIOPinConfigure(GPIO_PA5_SSI0TX);
+	
+	GPIOPinTypeSSI(GPIO_PORTA_BASE,GPIO_PIN_2);
+	GPIOPinTypeSSI(GPIO_PORTA_BASE,GPIO_PIN_4);
+	GPIOPinTypeSSI(GPIO_PORTA_BASE,GPIO_PIN_5);
+	
+	SSIConfigSetExpClk(	SSI0_BASE, SysCtlClockGet(), SSI_FRF_MOTO_MODE_0,
+	                	SSI_MODE_MASTER, 2000000/*500000*/, 16);
+	
+	SSIEnable(SSI0_BASE);							//使能SSI1
+}
+
+
+void pll_1_tx_data(uint32_t data)
+{
+	GPIOPinWrite(PLLLE_1_PORT, PLLLE_1_PIN, 0x0);
+	
+	SSIDataPut(SSI0_BASE, data>>16);;
+	SSIDataPut(SSI0_BASE, data);
+	//SSIDataPut(SSI0_BASE, 0xff);
+	//SSIDataPut(SSI0_BASE, 0x55);
+	//SSIDataPut(SSI0_BASE, 0xff);
+	//SSIDataPut(SSI0_BASE, 0x55);
+	while (SSIBusy(SSI0_BASE))
+	{
+	}
+
+	GPIOPinWrite(PLLLE_1_PORT, PLLLE_1_PIN, 0x02);
+	//SysCtlDelay(100);
+	//GPIOPinWrite(PLLLE_1_PORT, PLLLE_1_PIN, 0x00);
+}
+
 
 void adcIntHandler(void)
 {	
@@ -158,6 +208,8 @@ void adcIntHandler(void)
 	while(ADCSequenceDataGet(ADC_BASE, 0, &ulValue));
 	
 }
+
+
 
 
 //adc接口初始化
@@ -206,20 +258,17 @@ void timer1Init(void)
 	TimerIntEnable(TIMER1_BASE, TIMER_TIMA_TIMEOUT);                           //使能timer1超时中断
 	IntEnable(INT_TIMER1A);                                                                       //使能timer1中断
 	TimerEnable(TIMER1_BASE, TIMER_A);                                                   //使能timer1计数
-	c_timer = 0;
 }
 
 //Timer1中断服务程序
 void timer1AIntHandler(void)                             
 {
 	unsigned long ulStatus;
-       ulStatus = TimerIntStatus(TIMER1_BASE, true);                 //读取中断状态
-       TimerIntClear(TIMER1_BASE, ulStatus);                            //清除中断状态
-
+	ulStatus = TimerIntStatus(TIMER1_BASE, true);                 //读取中断状态
+	TimerIntClear(TIMER1_BASE, ulStatus);                            //清除中断状态
 	if (ulStatus & TIMER_TIMA_TIMEOUT)                               //timer0A超时中断
 	{
-
-				
+		GPIOPinWrite(LED_PORT, LED_PIN, ~GPIOPinRead(LED_PORT, LED_PIN) ); 	
 	}
 }
 
@@ -282,7 +331,7 @@ void GPIOAIntHandler_init(void)
 	GPIOPinIntEnable(GPIO_PORTA_BASE, GPIO_PIN_3);		   //使能相应管脚的中断
 	IntEnable(INT_GPIOA);
 	
-	IntMasterEnable(); // 使能处理器中断
+	//IntMasterEnable(); // 使能处理器中断
 }
 
 
@@ -315,7 +364,7 @@ void GPIOEIntHandler_init(void)
 	GPIOPinIntEnable(GPIO_PORTE_BASE, GPIO_PIN_4);		   //使能相应管脚的中断
 	IntEnable(INT_GPIOE);
 	
-	IntMasterEnable(); // 使能处理器中断
+	//IntMasterEnable(); // 使能处理器中断
 }
 
 
@@ -348,7 +397,7 @@ void timer2Init(void)
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER2);                                    //使能timer1模块
 	
 	TimerConfigure(TIMER2_BASE, TIMER_CFG_32_BIT_PER);        //timer1配置成32位
-	TimerLoadSet(TIMER2_BASE, TIMER_BOTH, 0xFA0000);                     
+	TimerLoadSet(TIMER2_BASE, TIMER_BOTH, SysCtlClockGet());                     
 	
 	IntPrioritySet(INT_TIMER2A, 7<<5);                                                       //设置timer1中断优先级为6
 	TimerIntEnable(TIMER2_BASE, TIMER_TIMA_TIMEOUT);                           //使能timer1超时中断
@@ -365,10 +414,7 @@ void timer2AIntHandler(void)
 	TimerIntClear(TIMER2_BASE, ulStatus);                            //清除中断状态
 	if (ulStatus & TIMER_TIMA_TIMEOUT)                               //timer0A超时中断
 	{
-		Tb = TimerValueGet(TIMER0_BASE,TIMER_A);
-		TimerLoadSet(TIMER0_BASE,TIMER_A,0x8000);
-		Ta = TimerValueGet(TIMER0_BASE,TIMER_A);
-		//GPIOPinWrite(LED_PORT, LED_PIN, ~GPIOPinRead(LED_PORT, LED_PIN) ); 
+		GPIOPinWrite(LED_PORT, LED_PIN, ~GPIOPinRead(LED_PORT, LED_PIN)); 	
 	}
 
 }
@@ -421,37 +467,22 @@ void watchdog_init(void)
 
 void main(void)
 {
-	IntMasterDisable();	//关中断
+	IntMasterDisable(); 
 
 	clockInit();
 	led_init();
-
+	timer1Init();
 	uart0Init();
 	uart1Init();
-	UARTStdioInitExpClk(UARTStdio_port_num, 57600);  //将UART1初始化为串行控制台
 
 	init_uart_info(&g_uart_comm);
 	init_uart_info(&g_uart_dbg);
 
-	//init_ccu_uart();
-	//init_software();     
-
-	//GPIOAIntHandler_init();//920电台告警GPIO中断初始化，PA3，针对V5及以上版本
-	//GPIOEIntHandler_init();//920电台告警GPIO中断初始化，PE4
-
-	UARTprintf("date = %s\n", __DATE__);
-	UARTprintf("time = %s\n\r", __TIME__);
-	//cmd_DIAG0_que();	   //初始向电台发送关闭命令DIAG0
-	//shutdown_radio_uart();	//初始化920完成之后关闭920串口
-	//enable_radio_uart();
-
-	//config_PLL();
-	//timer2Init();
-	//timer0Init();
-    //timer3Init();
-	//watchdog_init();
-    //memcpy(&radio_param,(void *)FLASH_BASE_ADDR,sizeof(radio_param));
-    
+	//iis_init();
+	ssi0_init();
+	pll_gpio_init();
+	
+	IntMasterEnable();  
 	while(1)
 	{
 		proc_uart_buf(&g_uart_comm);

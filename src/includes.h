@@ -17,19 +17,48 @@
 #include "flash.h"
 #include "interrupt.h"
 #include "I2c.h"
-#include "uartstdio.h"
 #include "Timer.h"
 #include "radio.h"
-#include "920_uart.h"
 #include "PLL.h"
 #include "i2s.h"
 #include "adc.h"
+#include "ssi.h"
+
+#include "my_uart.h"
 
 #define  FLASH_BASE_ADDR (0x1FC00)
 
+#define  LED_PERIPH             SYSCTL_PERIPH_GPIOA
+#define  LED_PORT                GPIO_PORTA_BASE
+#define  LED_PIN                  GPIO_PIN_6
+
+#define  PLLLE_1_PERIPH             SYSCTL_PERIPH_GPIOH
+#define  PLLLE_1_PORT                GPIO_PORTH_BASE
+#define  PLLLE_1_PIN                  GPIO_PIN_1
+
+#define  PLLCE_1_PERIPH             SYSCTL_PERIPH_GPIOH
+#define  PLLCE_1_PORT                GPIO_PORTH_BASE
+#define  PLLCE_1_PIN                  GPIO_PIN_0
+
+#define  PLLPDBRF_1_PERIPH             SYSCTL_PERIPH_GPIOB
+#define  PLLPDBRF_1_PORT                GPIO_PORTB_BASE
+#define  PLLPDBRF_1_PIN                  GPIO_PIN_6
+
+
+
+
+/*------------------------软件版本信息记录--------------*/
+/*
+V1.0.0 add by zhongh 2016-7-30
+	a.初始版本
+
+*/
+#define VER_INFO "V1.0.0"
+
+
+
 extern radio_param_t radio_param;
 extern void init_software(void);                       //定义于ccu_uart.c文件中
-extern void init_ccu_uart(void);
 extern void proc_ccu_uart_buf(void);
 extern void timer1Init(void);
 

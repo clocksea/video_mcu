@@ -1,35 +1,24 @@
-
+#include <stdarg.h>
 #include "includes.h"
 
-#define  PARA_LEN  20
 
-#define	 INIT	0 
-#define  PT   	1	
-#define	 DG		2
-#define  MX9XX   3   /*INFO? : 查询*/
-
-
-#define SS_IDLE			0
-#define SS_T_IDLE		1
-#define SS_CR_RECV		2
-#define SS_BEGINRECV	3
-#define SS_SYN      	4
-#define	CMD_CCUHBREP	5
-
-
-
+extern uart_info_t  g_uart_dbg;
+extern uart_info_t  g_uart_comm;
 
 /*调试串口数据结构初始化*/
 void init_uart_info(uart_info_t * info)
 {
 	info->ring_head = 0;
 	info->ring_tail = 0;
-	info->stream_state = SS_SYN;
+	info->stream_state = STATE_IDLE;
 	info->com_rx_sequence = 0;
 	info->com_received_flg = FALSE;
 	info->com_send_ready_flg = TRUE;
 	info->com_tx_len = 0;
-	info->com_tx_sequence = 0;	
+	info->com_tx_sequence = 0;
+	memset(info->com_tx_buf,0,sizeof(info->com_tx_buf));
+	memset(info->com_rx_buf,0,sizeof(info->com_rx_buf));
+	memset(info->ring_buf,0,sizeof(info->ring_buf));	
 }
 
 
@@ -94,59 +83,59 @@ int atoi(const char *str)
 }
 
 
+/*通用串口发送函数，例如向电台发送命令*/
+void uart_send_datas(unsigned long uart_base,uart_info_t *uart_data,char *data_2_send)
+{
+	unsigned short i, len;
+	
+	while(uart_data->com_send_ready_flg == FALSE);
+	strcpy(uart_data->com_tx_buf,data_2_send);
+	uart_data->com_tx_len = len = strlen(data_2_send);
+	if(len >= UART_BYE_FIFO)  len = UART_BYE_FIFO;
+	for(i=0; i< len; i++)
+	{
+		UARTCharPutNonBlocking(uart_base, uart_data->com_tx_buf[i]);
+	} 
+    
+	uart_data->com_tx_sequence = len;
+	uart_data->com_send_ready_flg = FALSE;   	
+}
 
-/***************************************************************/
-/*920 UART发送中断服务程序*/
-void UART_920_tx_isr(void)
+
+
+void UART_tx_isr(uint32_t base,uart_info_t *uart)
 {
 	unsigned char i, len;
-#if 0
-	if (g_uart_dbg.com_send_ready_flg == FALSE)
+
+	if (uart->com_send_ready_flg == FALSE)
 	{
-		if (g_uart_dbg.com_tx_len == g_uart_dbg.com_tx_sequence)
-			g_uart_dbg.com_send_ready_flg = TRUE;
+		if (uart->com_tx_len == uart->com_tx_sequence)
+			uart->com_send_ready_flg = TRUE;
 		else
 		{
-			if (g_uart_dbg.com_tx_len < (g_uart_dbg.com_tx_sequence + UART_BYE_FIFO))
-				len = g_uart_dbg.com_tx_len - g_uart_dbg.com_tx_sequence;
+			if (uart->com_tx_len < (uart->com_tx_sequence + UART_BYE_FIFO))
+				len = uart->com_tx_len - uart->com_tx_sequence;
 			else
 				len = UART_BYE_FIFO;
 			
 			for (i= 0 ; i< len ; i++)
 			{
-				UARTCharPutNonBlocking(uart_for_920, g_uart_dbg.com_tx_buf[i + g_uart_dbg.com_tx_sequence]);
+				UARTCharPutNonBlocking(base, uart->com_tx_buf[i + uart->com_tx_sequence]);
 			}
-			g_uart_dbg.com_tx_sequence += len;
+			uart->com_tx_sequence += len;
 		}
 	}
-#endif 
 }
 
-/***************************************************************/
-/*920 UART接收中断服务程序*/
-void UART_920_rx_isr(void)
+
+void UART_rx_isr(uint32_t base,uart_info_t *uart)
 {
-#if 0
-      unsigned char tmp;
-      unsigned short tail;
-	while (UARTCharsAvail(uart_for_920))                            //若接收FIFO中有可用数据
+	while (UARTCharsAvail(base))                            //若接收FIFO中有可用数据
 	{
-                  g_uart_dbg.ring_buf[g_uart_dbg.ring_tail] = (unsigned char)UARTCharGetNonBlocking(uart_for_920);
-		  g_uart_dbg.ring_tail = (g_uart_dbg.ring_tail + 1) % MAX_COM_RING_PACKSIZE; 
-               // tmp=(unsigned char)UARTCharGetNonBlocking(uart_for_920);
-              //  tail = g_uart_dbg.ring_tail+1;
-              //  if(tail==MAX_COM_RING_PACKSIZE)
-              //    tail=0;
-              //  if(tail!=g_uart_dbg.ring_head)
-              //  {
-     		//  g_uart_dbg.ring_buf[g_uart_dbg.ring_tail] = tmp;
-		//  g_uart_dbg.ring_tail = (g_uart_dbg.ring_tail + 1) % MAX_COM_RING_PACKSIZE;           
-               // }
-                  
-
-
+		uart->ring_buf[uart->ring_tail++] = (unsigned char)UARTCharGetNonBlocking(base);
+		if(uart->ring_tail>=MAX_COM_RING_PACKSIZE)
+			uart->ring_tail=0;	
 	}
-#endif
 }
 
 /***************************************************************/
@@ -157,31 +146,13 @@ void UART0IntHandler(void)
     ulStatus = UARTIntStatus(UART0_BASE, true);                 //读取中断状态
     UARTIntClear(UART0_BASE, ulStatus);                         //清除中断状态
 
-	if (board_ver == 1)				//为0x1则对应CCU/PC串口
-	{
-		if (ulStatus&UART_INT_RX || ulStatus&UART_INT_RT)       //接收中断或接收超时中断
-			UART_CCU_rx_isr();
-	}
-	else if (board_ver == 0xF)		//为0xF则对应920串口
-	{
-		if (ulStatus & UART_INT_TX)                             //发送中断
-			UART_920_tx_isr();
-		
-		if (ulStatus&UART_INT_RX || ulStatus&UART_INT_RT)       //接收中断或接收超时中断
-			UART_920_rx_isr();
-	}
+	if (ulStatus&UART_INT_RX || ulStatus&UART_INT_RT)		//接收中断或接收超时中断
+		UART_rx_isr(UART0_BASE,&g_uart_comm);
+	if (ulStatus & UART_INT_TX) 							//发送中断
+		UART_tx_isr(UART0_BASE,&g_uart_comm);
+
 }
 
-
-//CCU/PC UART接收中断服务程序
-void UART_CCU_rx_isr(void)
-{
-	while (UARTCharsAvail(uart_for_ccu))
-	{
-		ccu_uart_buf.ring_buf[ccu_uart_buf.ring_tail] = (unsigned char)UARTCharGetNonBlocking(uart_for_ccu);	
-		ccu_uart_buf.ring_tail = (ccu_uart_buf.ring_tail + 1) % MAX_COM_RING_PACKSIZE;
-	}
-}
 
 //UART1中断服务程序
 void UART1IntHandler(void)                             
@@ -191,7 +162,32 @@ void UART1IntHandler(void)
     UARTIntClear(UART1_BASE, ulStatus);                              //清除中断状态     
 
 	if (ulStatus&UART_INT_RX || ulStatus&UART_INT_RT)       //接收中断或接收超时中断
-		UART_CCU_rx_isr();
+		UART_rx_isr(UART1_BASE,&g_uart_dbg);
+	if (ulStatus & UART_INT_TX)                             //发送中断
+		UART_tx_isr(UART1_BASE,&g_uart_dbg);
+}
+
+
+void myprintf(const char *pcString, ...)
+{
+	char tmp[MAX_COMM_PACKSIZE];
+    va_list vaArgP;
+
+	memset(tmp,0,sizeof(tmp));
+    //
+    // Start the varargs processing.
+    //
+    va_start(vaArgP, pcString);	
+	
+	vsnprintf(tmp,sizeof(tmp), pcString, vaArgP);
+
+    //
+    // End the varargs processing.
+    //
+    va_end(vaArgP);	
+
+	uart_send_datas(UART1_BASE,&g_uart_dbg,tmp);
+	
 }
 
 

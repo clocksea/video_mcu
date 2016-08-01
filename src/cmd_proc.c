@@ -24,8 +24,8 @@ extern char RPM[10];
 extern char g_mx920_info[256];
 extern int32_t watchdog_cnt;
 /****************************/
-void resp_cmd_pots_query(void);
-DIAG_buf_t resp_DIAG_buf;
+
+
 extern int alarm_count;
 /*****************************/
 void init_software(void)
@@ -34,24 +34,16 @@ void init_software(void)
 	get_stored_param_from_flash();      
 }
 
-void init_ccu_uart(void)
-{
-	ccu_uart_buf.ring_head = 0;
-	ccu_uart_buf.ring_tail = 0;
-	ccu_uart_buf.stream_state = SS_SYN;
-	//ccu_uart_buf.stream_state = SS_IDLE;
-	ccu_uart_buf.com_rx_sequence = 0;
-	ccu_uart_buf.com_received_flg = FALSE;
-	ccu_uart_buf.com_send_ready_flg = TRUE;
-	ccu_uart_buf.com_tx_len = 0;
-	ccu_uart_buf.com_tx_sequence = 0;	
-}
 
 void __pll_reg0_set(uint32_t ch, uint32_t reg, uint32_t int_value, uint32_t frac)
 {
 	uint32_t value;
 
 	value = ((int_value & 0x3FFF) << 15) + ((frac & 0xFFF) << 3) + (reg&0x7);
+
+	myprintf("PLL:%d,REG:%d,VALUE=0x%08x\r\n",ch,reg,value);
+
+	pll_1_tx_data(value);
 }
 
 void __pll_reg1_set(uint32_t ch, uint32_t reg, uint32_t adj, uint32_t prescaler, uint32_t phase, uint32_t mod)
@@ -59,6 +51,8 @@ void __pll_reg1_set(uint32_t ch, uint32_t reg, uint32_t adj, uint32_t prescaler,
 	uint32_t value;
 
 	value = ((adj&1) << 28) + ((prescaler&1) << 27) + ((phase&0xFFF) << 15) + ((mod&0xFFF) << 3) + (reg&0x7);
+	
+	myprintf("PLL:%d,REG:%d,VALUE=0x%08x\r\n",ch,reg,value);
 }
 
 void __pll_reg2_set(uint32_t ch, uint32_t reg, uint32_t noise_mode, uint32_t muxout, uint32_t reference_double, uint32_t reference_div_by_2,
@@ -70,6 +64,8 @@ void __pll_reg2_set(uint32_t ch, uint32_t reg, uint32_t noise_mode, uint32_t mux
 	value = ((noise_mode&0x3) << 29) + ((muxout&0x7) << 26) + ((reference_double&1) << 25) + ((reference_div_by_2&1) << 24) +
 			((r_count&0x3FF) << 14) + ((double_buffer&1) << 13) + ((charge_pump&0xF) << 9) + ((ldf&1) << 8) +
 			((ldp&1) << 7) + ((pd&1) << 6) + ((power_down&1) << 5) + ((cp&1) << 4) + ((counter_reset&1) << 3) + (reg&0x7);
+
+	myprintf("PLL:%d,REG:%d,VALUE=0x%08x\r\n",ch,reg,value);
 }
 void __pll_reg3_set(uint32_t ch, uint32_t reg, uint32_t band_select, uint32_t abp, uint32_t charge_cancelation, uint32_t csr, uint32_t clk_div_mode, 
 						uint32_t clk_div_value)
@@ -78,6 +74,8 @@ void __pll_reg3_set(uint32_t ch, uint32_t reg, uint32_t band_select, uint32_t ab
 	
 	value = ((band_select&1) << 23) + ((abp&1) << 22) + ((charge_cancelation&1) << 21) + ((csr&1) << 18) + 
 			((clk_div_mode&3) << 15) + ((clk_div_value&0xFFF) << 3) + (reg&0x7);
+
+	myprintf("PLL:%d,REG:%d,VALUE=0x%08x\r\n",ch,reg,value);
 
 }
 void __pll_reg4_set(uint32_t ch, uint32_t reg, uint32_t feed_back_select, uint32_t rf_div_select, uint32_t band_select_clk_div, uint32_t vco_power_down,
@@ -89,14 +87,25 @@ void __pll_reg4_set(uint32_t ch, uint32_t reg, uint32_t feed_back_select, uint32
 			((mtld&1) << 10) + ((aux_output_select&1) << 9) + ((aux_out&1) << 8) + ((aux_output_power&3) << 6) +
 			((rf_out&1) << 5) + ((output_power&3) << 3) + (reg&0x7);
 
+	myprintf("PLL:%d,REG:%d,VALUE=0x%08x\r\n",ch,reg,value);
+
 }
 
 void __pll_reg5_set(uint32_t ch, uint32_t reg, uint32_t ld_pin_mode)
 {
 	uint32_t value;
 
-	value = ((ld_pin_mode&3) << 22) + (reg&0x7);
+	value = ((ld_pin_mode&3) << 22) + (3<<19) + (reg&0x7);
+	pll_1_tx_data(value);
+	myprintf("PLL:%d,REG:%d,VALUE=0x%08x\r\n",ch,reg,value);
 
+	GPIOPinWrite(PLLPDBRF_1_PORT, PLLPDBRF_1_PIN, 0x00);
+
+	//SysCtlDelay(100);
+
+	//value=0x0400;
+	//pll_1_tx_data(value);
+	//myprintf("PLL:%d,REG:%d,VALUE=0x%08x\r\n",ch,reg,value);
 }
 
 
@@ -116,7 +125,7 @@ void proc_PLLSET_cmd(char *buf, unsigned char len)
 {
 	uint32_t param[64];
 	uint32_t cnt=0;
-	char *cmd = buf + strlen("AT+PLLSET=");
+	char *cmd = buf + strlen("PLLSET=");
 
 	memset(param,0,sizeof(param));
 
@@ -126,7 +135,7 @@ void proc_PLLSET_cmd(char *buf, unsigned char len)
 		{
 	        if((*cmd >'9')||(*cmd <'0'))
 			{
-				 UARTprintf("input error,%s\n\r",buf);
+				 myprintf("input error,%s\n\r",buf);
 				 return;
 			}
 	        param[cnt] = 10*param[cnt]  + *cmd++ - '0'; 	
@@ -142,12 +151,12 @@ void proc_PLLSET_cmd(char *buf, unsigned char len)
 DONE:
 	if(param[0] > 1)
 	{
-		UARTprintf("input error,%s\n\r",buf);
+		myprintf("input error,%s\n\r",buf);
 		return;
 	}
 	if(param[1] > 5)
 	{
-		UARTprintf("input error,%s\n\r",buf);
+		myprintf("input error,%s\n\r",buf);
 		return;
 	}
 
@@ -173,7 +182,7 @@ DONE:
 			__pll_reg5_set(param[0],param[1],param[2]);
 			break;
 		default:
-			UARTprintf("input error,%s\n\r",buf);
+			myprintf("input error,%s\n\r",buf);
 			return;
 
 	}
@@ -183,6 +192,13 @@ DONE:
 void proc_PLLGET_cmd(char *buf, unsigned char len)
 {
 	
+}
+
+void proc_INFO_cmd(char *buf, unsigned char len)
+{
+	myprintf("-----------单片机信息如下-------------\r\n");
+	myprintf("软件版本:ver = %s\r\n",VER_INFO);
+	myprintf("         date = %s %s\r\n", __DATE__,__TIME__);	
 }
 
 
@@ -198,28 +214,32 @@ void proc_AT_cmd(char *buf, unsigned char len)
 		i++;
 		if(i>sizeof(cmd))
 		{
-			UARTprintf("cmd too long,%s\n\r",buf);
+			myprintf("cmd too long,%s\n\r",buf);
 			return;
 		}
 	}
-	if(0==strcmp(cmd,"AT+SMFREQ"))
+	if(0==strcmp(cmd,"SMFREQ"))
 	{
 		proc_SMFREQ_cmd(buf,len);
 	}
-	else if(0==strcmp(cmd,"AT+SSFREQ"))
+	else if(0==strcmp(cmd,"SSFREQ"))
 	{
 		proc_SSFREQ_cmd(buf,len);
 	}
-	else if(0==strcmp(cmd,"AT+PLLSET"))
+	else if(0==strcmp(cmd,"PLLSET"))
 	{
 		proc_PLLSET_cmd(buf,len);
 	}
-	else if(0==strcmp(cmd,"AT+PLLGET"))
+	else if(0==strcmp(cmd,"PLLGET"))
 	{
 		proc_PLLGET_cmd(buf,len);
 	}
+	else if(0==strcmp(cmd,"INFO"))
+	{
+		proc_INFO_cmd(buf,len);
+	}	
 	else
-		UARTprintf("Input error,%s\n\r",buf);
+		myprintf("Input error,%s\n\r",buf);
 	return;
 }
 
@@ -263,7 +283,7 @@ void proc_uart_buf(uart_info_t *uart)
 				}
 				break;
 			case STATE_HEAD_DOT:
-				if ('+' == c)
+				if ('_' == c)
 				{
 					uart->com_rx_sequence = 0;
 					uart->stream_state = STATE_REV_START;

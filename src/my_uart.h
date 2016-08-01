@@ -56,7 +56,7 @@ typedef struct
 	char	                com_tx_buf[MAX_COMM_PACKSIZE];
 	unsigned char	  com_send_ready_flg;
 	unsigned short  com_tx_len;
-	unsigned short  com_tx_sequence;
+	unsigned short  com_tx_sequence;	
 
 }uart_info_t;
 

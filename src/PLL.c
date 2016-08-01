@@ -156,7 +156,7 @@ void proc_CFG_set_pll(char *buf)		//16
 	{
 		if ((*buf >'9')||(*buf <'0'))
 		{
-			UARTprintf("Input error\n\r");
+			myprintf("Input error\n\r");
 			return;
 		}
 		CPI1 = CPI1 * 10 + (*buf++ - '0');
@@ -164,7 +164,7 @@ void proc_CFG_set_pll(char *buf)		//16
 	}
 	if (CPI1 > 7)
 	{
-		UARTprintf("%d是无效参数，CPI1可配范围为0~7\n\r", CPI1);
+		myprintf("%d是无效参数，CPI1可配范围为0~7\n\r", CPI1);
 		return;
 	}
 	
@@ -179,7 +179,7 @@ void proc_CFG_set_pll(char *buf)		//16
 	{
 		if ((*buf >'9')||(*buf <'0'))
 		{
-			UARTprintf("Input error\n\r");
+			myprintf("Input error\n\r");
 			return;
 		}
 		mux_out_sel = mux_out_sel * 10 + (*buf++ - '0');
@@ -187,7 +187,7 @@ void proc_CFG_set_pll(char *buf)		//16
 	}
 	if (mux_out_sel > 7)
 	{
-		UARTprintf("%d是无效参数，mux_out可配范围为0~7\n\r", mux_out_sel);
+		myprintf("%d是无效参数，mux_out可配范围为0~7\n\r", mux_out_sel);
 		return;
 	}
 	
@@ -202,7 +202,7 @@ void proc_CFG_set_pll(char *buf)		//16
 	{
 		if ((*buf >'9')||(*buf <'0'))
 		{
-			UARTprintf("Input error\n\r");
+			myprintf("Input error\n\r");
 			return;
 		}
 		ref_cnt = ref_cnt * 10 + (*buf++ - '0');
@@ -216,7 +216,7 @@ void proc_CFG_set_pll(char *buf)		//16
 	
 	if ((ref_cnt > 16383) || (ref_cnt == 0))
 	{
-		UARTprintf("%d是无效参数，ref_cnt可配范围为1~16383\n\r", ref_cnt);
+		myprintf("%d是无效参数，ref_cnt可配范围为1~16383\n\r", ref_cnt);
 		return;
 	}
 	
@@ -226,7 +226,7 @@ void proc_CFG_set_pll(char *buf)		//16
 	{
 		if ((*buf >'9')||(*buf <'0'))
 		{
-			UARTprintf("Input error\n\r");
+			myprintf("Input error\n\r");
 			return;
 		}
 		N_cnt = N_cnt * 10 + (*buf++ - '0');
@@ -238,10 +238,10 @@ void proc_CFG_set_pll(char *buf)		//16
 	
 	if ((N_cnt > 8191) || (N_cnt == 0))
 	{
-		UARTprintf("%d是无效参数，N_cnt可配范围为1~8191\n\r", N_cnt);
+		myprintf("%d是无效参数，N_cnt可配范围为1~8191\n\r", N_cnt);
 		return;
 	}
 	
 	reconfig_PLL(CPI1, mux_out_sel, ref_cnt, N_cnt);
-	UARTprintf("CPI1:%d; mux_out:%d; ref_cnt:%d; N_cnt:%d\n\r", CPI1,mux_out_sel,ref_cnt,N_cnt);
+	myprintf("CPI1:%d; mux_out:%d; ref_cnt:%d; N_cnt:%d\n\r", CPI1,mux_out_sel,ref_cnt,N_cnt);
 }
