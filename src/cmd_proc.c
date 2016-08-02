@@ -7,26 +7,10 @@ char *mcusoft_version = "V1.0.0.0-20160721";          //MCU软件版本号
 
 ccu_pc_buf_t ccu_pc_buf;
 uart_buf_t ccu_uart_buf;
-extern radio_param_t radio_param;
-//static radio_param_t radio_param;
 
-#define  PARA_LEN  20
-#define  HEART_LEN 40
-//#define  MAX_SIZE  20	//调试
-#define  UART_BYE_FIFO_U 50
-#define  band_w    1	//宽带,非1的为窄带
-
-extern const char *comma;
-extern const char *dot;
-extern const char *enter;
-extern const char *zero;
-extern char RPM[10];
-extern char g_mx920_info[256];
-extern int32_t watchdog_cnt;
 /****************************/
-
-
-extern int alarm_count;
+extern radio_param_t radio_param;
+extern int32_t watchdog_cnt;
 /*****************************/
 void init_software(void)
 {
@@ -114,7 +98,39 @@ void __pll_reg5_set(uint32_t ch, uint32_t reg, uint32_t ld_pin_mode)
 
 void proc_SMFREQ_cmd(char *buf, unsigned char len)
 {
+	uint32_t param[64];
+	uint32_t cnt=0;
+	char *cmd = buf + strlen("SMFREQ=");
+
+	memset(param,0,sizeof(param));
+
+	while(1)
+	{
+		while((*cmd != ',') && (*cmd != CR) && (*cmd != LF))
+		{
+	        if((*cmd >'9')||(*cmd <'0'))
+			{
+				 myprintf("input error,%s\n\r",buf);
+				 return;
+			}
+	        param[cnt] = 10*param[cnt]  + *cmd++ - '0'; 	
+		}
+		cnt++;
+		if((*cmd == CR) || (*cmd == LF))
+		{
+			goto DONE;
+		}
+
+		cmd++;		
+	}
+DONE:
+	if(cnt > 1)
+	{
+		myprintf("input error,%s\n\r",buf);
+		return;
+	}
 	
+
 }
 
 void proc_SSFREQ_cmd(char *buf, unsigned char len)
