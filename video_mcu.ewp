@@ -1642,6 +1642,9 @@
   <group>
     <name>src</name>
     <file>
+      <name>$PROJ_DIR$\src\adf4351.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\src\cmd_proc.c</name>
     </file>
     <file>

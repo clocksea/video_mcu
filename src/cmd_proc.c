@@ -1,5 +1,5 @@
 
-#include "includes.h"
+#include "cmd_proc.h"
 
 
 
@@ -27,7 +27,7 @@ void __pll_reg0_set(uint32_t ch, uint32_t reg, uint32_t int_value, uint32_t frac
 
 	myprintf("PLL:%d,REG:%d,VALUE=0x%08x\r\n",ch,reg,value);
 
-	pll_1_tx_data(value);
+	//pll_1_tx_data(value);
 }
 
 void __pll_reg1_set(uint32_t ch, uint32_t reg, uint32_t adj, uint32_t prescaler, uint32_t phase, uint32_t mod)
@@ -36,6 +36,8 @@ void __pll_reg1_set(uint32_t ch, uint32_t reg, uint32_t adj, uint32_t prescaler,
 
 	value = ((adj&1) << 28) + ((prescaler&1) << 27) + ((phase&0xFFF) << 15) + ((mod&0xFFF) << 3) + (reg&0x7);
 	
+	//pll_1_tx_data(value);
+
 	myprintf("PLL:%d,REG:%d,VALUE=0x%08x\r\n",ch,reg,value);
 }
 
@@ -49,6 +51,8 @@ void __pll_reg2_set(uint32_t ch, uint32_t reg, uint32_t noise_mode, uint32_t mux
 			((r_count&0x3FF) << 14) + ((double_buffer&1) << 13) + ((charge_pump&0xF) << 9) + ((ldf&1) << 8) +
 			((ldp&1) << 7) + ((pd&1) << 6) + ((power_down&1) << 5) + ((cp&1) << 4) + ((counter_reset&1) << 3) + (reg&0x7);
 
+	//pll_1_tx_data(value);
+
 	myprintf("PLL:%d,REG:%d,VALUE=0x%08x\r\n",ch,reg,value);
 }
 void __pll_reg3_set(uint32_t ch, uint32_t reg, uint32_t band_select, uint32_t abp, uint32_t charge_cancelation, uint32_t csr, uint32_t clk_div_mode, 
@@ -58,6 +62,8 @@ void __pll_reg3_set(uint32_t ch, uint32_t reg, uint32_t band_select, uint32_t ab
 	
 	value = ((band_select&1) << 23) + ((abp&1) << 22) + ((charge_cancelation&1) << 21) + ((csr&1) << 18) + 
 			((clk_div_mode&3) << 15) + ((clk_div_value&0xFFF) << 3) + (reg&0x7);
+
+	//pll_1_tx_data(value);
 
 	myprintf("PLL:%d,REG:%d,VALUE=0x%08x\r\n",ch,reg,value);
 
@@ -71,6 +77,8 @@ void __pll_reg4_set(uint32_t ch, uint32_t reg, uint32_t feed_back_select, uint32
 			((mtld&1) << 10) + ((aux_output_select&1) << 9) + ((aux_out&1) << 8) + ((aux_output_power&3) << 6) +
 			((rf_out&1) << 5) + ((output_power&3) << 3) + (reg&0x7);
 
+	//pll_1_tx_data(value);
+
 	myprintf("PLL:%d,REG:%d,VALUE=0x%08x\r\n",ch,reg,value);
 
 }
@@ -78,18 +86,58 @@ void __pll_reg4_set(uint32_t ch, uint32_t reg, uint32_t feed_back_select, uint32
 void __pll_reg5_set(uint32_t ch, uint32_t reg, uint32_t ld_pin_mode)
 {
 	uint32_t value;
+	uint8_t tmp[4];
 
 	value = ((ld_pin_mode&3) << 22) + (3<<19) + (reg&0x7);
-	pll_1_tx_data(value);
+	//pll_1_tx_data(value);
+#if 0	
+	tmp[3] = 0x00;
+	tmp[2] = 0xd8;
+	tmp[1] = 0x00;				//write communication register 0x00580005 to control the progress 
+ 	tmp[0] = 0x05;				//to write Register 5 to set digital lock detector
+	WriteToADF4351_1(4,tmp);
+#endif
+
+	tmp[3] = 0x00;
+	tmp[2] = 0x58;
+	tmp[1] = 0x00;				//write communication register 0x00580005 to control the progress 
+ 	tmp[0] = 0x05;				//to write Register 5 to set digital lock detector
+	WriteToADF4351_1(4,tmp);		
+
+	tmp[3] = 0x00;
+	tmp[2] = 0xCC;				//(DB23=1)The signal is taken from the VCO directly;(DB22-20:4H)the RF divider is 16;(DB19-12:50H)R is 80
+	tmp[1] = 0x80;				//(DB11=0)VCO powerd up;
+ 	tmp[0] = 0x3C;				//(DB5=1)RF output is enabled;(DB4-3=3H)Output power level is 5
+	WriteToADF4351_1(4,tmp);		
+
+	tmp[3] = 0x00;
+	tmp[2] = 0x00;
+	tmp[1] = 0x04;				//(DB14-3:96H)clock divider value is 150.
+ 	tmp[0] = 0xB3;
+	WriteToADF4351_1(4,tmp);
+
+	tmp[3] = 0x00;
+	tmp[2] = 0x00;				//(DB6=1)set PD polarity is positive;(DB7=1)LDP is 6nS;
+	tmp[1] = 0x4E;				//(DB8=0)enable fractional-N digital lock detect;
+ 	tmp[0] = 0x42;				//(DB12-9:7H)set Icp 2.50 mA;
+	WriteToADF4351_1(4,tmp);	//(DB23-14:1H)R counter is 1
+
+	tmp[3] = 0x08;
+	tmp[2] = 0x00;
+	tmp[1] = 0x80;			   //(DB14-3:6H)MOD counter is 6;
+ 	tmp[0] = 0x11;			   //(DB26-15:6H)PHASE word is 1,neither the phase resync 
+	WriteToADF4351_1(4,tmp);	   //nor the spurious optimization functions are being used
+							   //(DB27=1)prescaler value is 8/9
+
+	tmp[3] = 0x00;
+	tmp[2] = 0x40;
+	tmp[1] = 0x00;
+ 	tmp[0] = 0x00;				//(DB14-3:0H)FRAC value is 0;
+	WriteToADF4351_1(4,tmp);		//(DB30-15:140H)INT value is 320;
+
+	
 	myprintf("PLL:%d,REG:%d,VALUE=0x%08x\r\n",ch,reg,value);
 
-	GPIOPinWrite(PLLPDBRF_1_PORT, PLLPDBRF_1_PIN, 0x00);
-
-	//SysCtlDelay(100);
-
-	//value=0x0400;
-	//pll_1_tx_data(value);
-	//myprintf("PLL:%d,REG:%d,VALUE=0x%08x\r\n",ch,reg,value);
 }
 
 

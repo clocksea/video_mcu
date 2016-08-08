@@ -147,58 +147,29 @@ void pll_gpio_init(void)
 {
 	SysCtlPeripheralEnable(PLLLE_1_PERIPH);                      
 	GPIOPinTypeGPIOOutput(PLLLE_1_PORT, PLLLE_1_PIN);       
-	//GPIOPinWrite(PLLLE_1_PORT, PLLLE_1_PIN, 0x00);
-	GPIOPinWrite(PLLLE_1_PORT, PLLLE_1_PIN, 0x02);
+	CLR_LE1();
 
 	SysCtlPeripheralEnable(PLLCE_1_PERIPH);                      
 	GPIOPinTypeGPIOOutput(PLLCE_1_PORT, PLLCE_1_PIN);       
-	GPIOPinWrite(PLLCE_1_PORT, PLLCE_1_PIN, 0x01);
+	GPIOPinWrite(PLLCE_1_PORT, PLLCE_1_PIN, GPIO_PIN_0);
 
 	SysCtlPeripheralEnable(PLLPDBRF_1_PERIPH);                      
 	GPIOPinTypeGPIOOutput(PLLPDBRF_1_PORT, PLLPDBRF_1_PIN);       
-	GPIOPinWrite(PLLPDBRF_1_PORT, PLLPDBRF_1_PIN, 0x40);	
+	GPIOPinWrite(PLLPDBRF_1_PORT, PLLPDBRF_1_PIN, GPIO_PIN_6);	
+
+	SysCtlPeripheralEnable(PLLCLK_PERIPH);						
+	GPIOPinTypeGPIOOutput(PLLCLK_PORT, PLLCLK_PIN); 
+	CLR_SCL();
+
+	SysCtlPeripheralEnable(PLLDATA_PERIPH);						
+	GPIOPinTypeGPIOOutput(PLLDATA_PORT, PLLDATA_PIN); 
+	CLR_DATA();
+
+
+	
 }
 
 
-void ssi0_init(void)
-{
-	SysCtlPeripheralEnable(SYSCTL_PERIPH_SSI0);	
-	
-	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);	
-	
-	GPIOPinConfigure(GPIO_PA2_SSI0CLK);
-	GPIOPinConfigure(GPIO_PA4_SSI0RX);
-	GPIOPinConfigure(GPIO_PA5_SSI0TX);
-	
-	GPIOPinTypeSSI(GPIO_PORTA_BASE,GPIO_PIN_2);
-	GPIOPinTypeSSI(GPIO_PORTA_BASE,GPIO_PIN_4);
-	GPIOPinTypeSSI(GPIO_PORTA_BASE,GPIO_PIN_5);
-	
-	SSIConfigSetExpClk(	SSI0_BASE, SysCtlClockGet(), SSI_FRF_MOTO_MODE_0,
-	                	SSI_MODE_MASTER, 2000000/*500000*/, 16);
-	
-	SSIEnable(SSI0_BASE);							//Ê¹ÄÜSSI1
-}
-
-
-void pll_1_tx_data(uint32_t data)
-{
-	GPIOPinWrite(PLLLE_1_PORT, PLLLE_1_PIN, 0x0);
-	
-	SSIDataPut(SSI0_BASE, data>>16);;
-	SSIDataPut(SSI0_BASE, data);
-	//SSIDataPut(SSI0_BASE, 0xff);
-	//SSIDataPut(SSI0_BASE, 0x55);
-	//SSIDataPut(SSI0_BASE, 0xff);
-	//SSIDataPut(SSI0_BASE, 0x55);
-	while (SSIBusy(SSI0_BASE))
-	{
-	}
-
-	GPIOPinWrite(PLLLE_1_PORT, PLLLE_1_PIN, 0x02);
-	//SysCtlDelay(100);
-	//GPIOPinWrite(PLLLE_1_PORT, PLLLE_1_PIN, 0x00);
-}
 
 
 void adcIntHandler(void)
@@ -479,10 +450,13 @@ void main(void)
 	init_uart_info(&g_uart_dbg);
 
 	//iis_init();
-	ssi0_init();
+	//ssi0_init();
 	pll_gpio_init();
 	
 	IntMasterEnable();  
+
+	adf4351_init(1,&pll_info[0]);
+	
 	while(1)
 	{
 		proc_uart_buf(&g_uart_comm);

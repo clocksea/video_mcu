@@ -36,15 +36,43 @@
 #define  PLLLE_1_PORT                GPIO_PORTH_BASE
 #define  PLLLE_1_PIN                  GPIO_PIN_1
 
+#define  PLLLE_2_PERIPH             SYSCTL_PERIPH_GPIOC
+#define  PLLLE_2_PORT                GPIO_PORTC_BASE
+#define  PLLLE_2_PIN                  GPIO_PIN_6
+
+
+#define  PLLCLK_PERIPH             SYSCTL_PERIPH_GPIOD
+#define  PLLCLK_PORT                GPIO_PORTD_BASE
+#define  PLLCLK_PIN                  GPIO_PIN_6
+
+#define  PLLDATA_PERIPH             SYSCTL_PERIPH_GPIOF
+#define  PLLDATA_PORT                GPIO_PORTF_BASE
+#define  PLLDATA_PIN                  GPIO_PIN_0
+
 #define  PLLCE_1_PERIPH             SYSCTL_PERIPH_GPIOH
 #define  PLLCE_1_PORT                GPIO_PORTH_BASE
 #define  PLLCE_1_PIN                  GPIO_PIN_0
+
+#define  PLLCE_2_PERIPH             SYSCTL_PERIPH_GPIOC
+#define  PLLCE_2_PORT                GPIO_PORTC_BASE
+#define  PLLCE_2_PIN                  GPIO_PIN_7
 
 #define  PLLPDBRF_1_PERIPH             SYSCTL_PERIPH_GPIOB
 #define  PLLPDBRF_1_PORT                GPIO_PORTB_BASE
 #define  PLLPDBRF_1_PIN                  GPIO_PIN_6
 
 
+#define SET_LE1()		GPIOPinWrite(PLLLE_1_PORT, PLLLE_1_PIN, PLLLE_1_PIN)
+#define CLR_LE1()		GPIOPinWrite(PLLLE_1_PORT, PLLLE_1_PIN, 0)
+	
+#define	SET_SCL()		GPIOPinWrite(PLLCLK_PORT, PLLCLK_PIN, PLLCLK_PIN)
+#define	CLR_SCL()		GPIOPinWrite(PLLCLK_PORT, PLLCLK_PIN, 0)
+	
+#define SET_DATA()		GPIOPinWrite(PLLDATA_PORT, PLLDATA_PIN, PLLDATA_PIN)
+#define CLR_DATA()		GPIOPinWrite(PLLDATA_PORT, PLLDATA_PIN, 0)
+	
+#define SET_CE2()		GPIOPinWrite(PLLCE_2_PORT, PLLCE_2_PIN, PLLCE_2_PIN)	
+#define CLR_CE2()		GPIOPinWrite(PLLCE_2_PORT, PLLCE_2_PIN, 0)
 
 
 /*------------------------软件版本信息记录--------------*/
