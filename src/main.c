@@ -17,6 +17,8 @@ uart_info_t  g_uart_dbg;/*调试串口*/
 uart_info_t  g_uart_comm;/*通信串口*/
 
 
+extern pll_info_t pll_info[2];
+
 //系统时钟初始化
 void clockInit(void)
 {

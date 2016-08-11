@@ -25,6 +25,7 @@
 #include "ssi.h"
 
 #include "my_uart.h"
+#include "adf4351.h"
 
 #define  FLASH_BASE_ADDR (0x1FC00)
 
@@ -73,6 +74,13 @@
 	
 #define SET_CE2()		GPIOPinWrite(PLLCE_2_PORT, PLLCE_2_PIN, PLLCE_2_PIN)	
 #define CLR_CE2()		GPIOPinWrite(PLLCE_2_PORT, PLLCE_2_PIN, 0)
+
+
+#define MID_FREQ_HZ		(480*1000*1000)/*480MHz*/
+
+#define MAX_FREQ_HZ		(2600*1000*1000)/*2600MHz*/
+#define MIN_FREQ_HZ		(800*1000*1000)/*800MHz*/
+#define FREQ_1_MHZ		(1000*1000)/*1MHZ*/
 
 
 /*------------------------软件版本信息记录--------------*/

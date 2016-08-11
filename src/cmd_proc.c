@@ -11,6 +11,8 @@ uart_buf_t ccu_uart_buf;
 /****************************/
 extern radio_param_t radio_param;
 extern int32_t watchdog_cnt;
+extern pll_info_t pll_info[2];
+extern double cp_map[16];
 /*****************************/
 void init_software(void)
 {
@@ -143,6 +145,52 @@ void __pll_reg5_set(uint32_t ch, uint32_t reg, uint32_t ld_pin_mode)
 
 
 
+void proc_SMPLLCP_cmd(char *buf, unsigned char len)
+{
+	uint32_t param[64];
+	uint32_t cnt=0;
+	char *cmd = buf + strlen("SMPLLCP=");
+
+	memset(param,0,sizeof(param));
+
+	while(1)
+	{
+		while((*cmd != ',') && (*cmd != CR) && (*cmd != LF))
+		{
+	        if((*cmd >'9')||(*cmd <'0'))
+			{
+				 myprintf("input error,%s\n\r",buf);
+				 return;
+			}
+	        param[cnt] = 10*param[cnt]  + *cmd++ - '0'; 	
+		}
+		cnt++;
+		if((*cmd == CR) || (*cmd == LF))
+		{
+			goto DONE;
+		}
+
+		cmd++;		
+	}
+DONE:
+	if(cnt > 1)
+	{
+		myprintf("input error,%s\n\r",buf);
+		return;
+	}
+	if(param[0]>=16)
+	{
+		myprintf("输入PLL泵电流错误,%d\n\r",param[0]);
+		return;		
+	}
+	
+	pll_info[0].cp_value = param[0];
+	myprintf("主PLL泵电流为%fmA\n\r",cp_map[pll_info[0].cp_value]);
+	
+	rf_out(&pll_info[0]);
+}
+
+
 
 void proc_SMFREQ_cmd(char *buf, unsigned char len)
 {
@@ -177,8 +225,16 @@ DONE:
 		myprintf("input error,%s\n\r",buf);
 		return;
 	}
+	if((param[0]<(MIN_FREQ_HZ/FREQ_1_MHZ)) || (param[0]>(MAX_FREQ_HZ/FREQ_1_MHZ)))
+	{
+		myprintf("输入频率超出范围,%dHz\n\r",param[0]);
+		return;		
+	}
+	param[0] = param[0]*FREQ_1_MHZ;
+	pll_info[0].rf_freq_hz = param[0]-MID_FREQ_HZ;
+	myprintf("主接收频率设置为%dHz,pll-1设置为:%dHz\n\r",param[0],pll_info[0].rf_freq_hz);
 	
-
+	rf_out(&pll_info[0]);
 }
 
 void proc_SSFREQ_cmd(char *buf, unsigned char len)
@@ -258,6 +314,13 @@ void proc_PLLGET_cmd(char *buf, unsigned char len)
 	
 }
 
+
+void proc_PLLINFO_cmd(char *buf, unsigned char len)
+{
+	printf_pll_info(&pll_info[0]);
+}
+
+
 void proc_INFO_cmd(char *buf, unsigned char len)
 {
 	myprintf("-----------单片机信息如下-------------\r\n");
@@ -301,7 +364,15 @@ void proc_AT_cmd(char *buf, unsigned char len)
 	else if(0==strcmp(cmd,"INFO"))
 	{
 		proc_INFO_cmd(buf,len);
-	}	
+	}
+	else if(0==strcmp(cmd,"PLLINFO"))
+	{
+		proc_PLLINFO_cmd(buf,len);
+	}
+	else if(0==strcmp(cmd,"SMPLLCP"))
+	{
+		proc_SMPLLCP_cmd(buf,len);
+	}		
 	else
 		myprintf("Input error,%s\n\r",buf);
 	return;

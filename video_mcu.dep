@@ -6,25 +6,58 @@
   <configuration>
     <name>Debug</name>
     <outputs>
-      <file>$PROJ_DIR$\src\main.c</file>
+      <file>$PROJ_DIR$\src\cmd_proc.c</file>
       <file>$PROJ_DIR$\lib\driverlib.a</file>
       <file>$TOOLKIT_DIR$\inc\Luminary\driverlib\rom_map.h</file>
-      <file>$TOOLKIT_DIR$\inc\Luminary\utils\uartstdio.h</file>
-      <file>$TOOLKIT_DIR$\inc\Luminary\inc\hw_memmap.h</file>
+      <file>$TOOLKIT_DIR$\inc\Luminary\inc\hw_types.h</file>
+      <file>$TOOLKIT_DIR$\inc\Luminary\inc\hw_uart.h</file>
       <file>$TOOLKIT_DIR$\inc\Luminary\driverlib\interrupt.h</file>
       <file>$TOOLKIT_DIR$\inc\Luminary\driverlib\debug.h</file>
-      <file>$TOOLKIT_DIR$\inc\Luminary\inc\hw_uart.h</file>
-      <file>$TOOLKIT_DIR$\inc\Luminary\inc\hw_types.h</file>
-      <file>$PROJ_DIR$\src\cmd_proc.c</file>
+      <file>$TOOLKIT_DIR$\inc\Luminary\inc\hw_memmap.h</file>
+      <file>$TOOLKIT_DIR$\inc\Luminary\utils\uartstdio.h</file>
+      <file>$PROJ_DIR$\src\adf4351.c</file>
+      <file>$PROJ_DIR$\src\main.c</file>
       <file>$PROJ_DIR$\src\my_uart.c</file>
       <file>$PROJ_DIR$\src\PLL.c</file>
       <file>$PROJ_DIR$\src\startup_ewarm.c</file>
-      <file>$PROJ_DIR$\Debug\Obj\uartstdio.o</file>
-      <file>$TOOLKIT_DIR$\inc\Luminary\inc\hw_ints.h</file>
+      <file>$TOOLKIT_DIR$\inc\stdio.h</file>
+      <file>$PROJ_DIR$\inc\driverlib\interrupt.h</file>
+      <file>$PROJ_DIR$\inc\driverlib\flash.h</file>
+      <file>$PROJ_DIR$\inc\driverlib\gpio.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\cmd_proc.o</file>
+      <file>$TOOLKIT_DIR$\config\generic_cortex.icf</file>
+      <file>$PROJ_DIR$\inc\driverlib\sysctl.h</file>
+      <file>$PROJ_DIR$\inc\hw_types.h</file>
+      <file>$PROJ_DIR$\inc\driverlib\i2c.h</file>
+      <file>$PROJ_DIR$\inc\driverlib\ssi.h</file>
+      <file>$PROJ_DIR$\inc\hw_ints.h</file>
+      <file>$PROJ_DIR$\Debug\Exe\video_mcu.out</file>
+      <file>$PROJ_DIR$\Debug\Obj\video_mcu.pbd</file>
+      <file>$TOOLKIT_DIR$\lib\rt7M_tl.a</file>
+      <file>$PROJ_DIR$\inc\driverlib\debug.h</file>
+      <file>$TOOLKIT_DIR$\lib\dl7M_tl_in.a</file>
+      <file>$PROJ_DIR$\Debug\Obj\main.pbi</file>
+      <file>$PROJ_DIR$\Debug\Obj\uartstdio.pbi</file>
+      <file>$TOOLKIT_DIR$\lib\shb_l.a</file>
+      <file>$PROJ_DIR$\Debug\Obj\main.o</file>
+      <file>$PROJ_DIR$\Debug\Obj\startup_ewarm.o</file>
+      <file>$TOOLKIT_DIR$\inc\stdarg.h</file>
+      <file>$TOOLKIT_DIR$\inc\Luminary\driverlib\uart.h</file>
+      <file>$TOOLKIT_DIR$\inc\Luminary\driverlib\rom.h</file>
+      <file>$PROJ_DIR$\main.c</file>
+      <file>$PROJ_DIR$\utils\uartstdio.c</file>
+      <file>$PROJ_DIR$\src\920_uart.c</file>
+      <file>$PROJ_DIR$\inc\driverlib\i2s.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\adf4351.o</file>
+      <file>$PROJ_DIR$\src\radio.c</file>
+      <file>$PROJ_DIR$\Debug\Obj\adf4351.pbi</file>
+      <file>$PROJ_DIR$\src\adf4351.h</file>
       <file>$PROJ_DIR$\src\hw_memmap.h</file>
+      <file>$TOOLKIT_DIR$\inc\Luminary\inc\hw_ints.h</file>
+      <file>$PROJ_DIR$\Debug\Obj\uartstdio.o</file>
       <file>$PROJ_DIR$\inc\driverlib\timer.h</file>
-      <file>$PROJ_DIR$\inc\hw_gpio.h</file>
       <file>$PROJ_DIR$\utils\uartstdio.h</file>
+      <file>$PROJ_DIR$\inc\hw_gpio.h</file>
       <file>$TOOLKIT_DIR$\inc\Luminary\driverlib\sysctl.h</file>
       <file>$PROJ_DIR$\src\920_uart.h</file>
       <file>$TOOLKIT_DIR$\inc\DLib_Product_string.h</file>
@@ -54,251 +87,27 @@
       <file>$PROJ_DIR$\Debug\Obj\920_uart.o</file>
       <file>$PROJ_DIR$\inc\driverlib\uart.h</file>
       <file>$PROJ_DIR$\inc\driverlib\adc.h</file>
-      <file>$TOOLKIT_DIR$\inc\stdio.h</file>
-      <file>$PROJ_DIR$\inc\driverlib\interrupt.h</file>
-      <file>$PROJ_DIR$\inc\driverlib\gpio.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\cmd_proc.o</file>
-      <file>$PROJ_DIR$\inc\driverlib\flash.h</file>
-      <file>$PROJ_DIR$\inc\driverlib\sysctl.h</file>
-      <file>$PROJ_DIR$\inc\hw_types.h</file>
-      <file>$TOOLKIT_DIR$\config\generic_cortex.icf</file>
-      <file>$PROJ_DIR$\inc\driverlib\i2c.h</file>
-      <file>$PROJ_DIR$\inc\hw_ints.h</file>
-      <file>$PROJ_DIR$\inc\driverlib\ssi.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\video_mcu.pbd</file>
-      <file>$PROJ_DIR$\Debug\Exe\video_mcu.out</file>
-      <file>$TOOLKIT_DIR$\lib\rt7M_tl.a</file>
-      <file>$PROJ_DIR$\inc\driverlib\debug.h</file>
-      <file>$PROJ_DIR$\Debug\Obj\main.pbi</file>
-      <file>$TOOLKIT_DIR$\lib\dl7M_tl_in.a</file>
-      <file>$PROJ_DIR$\Debug\Obj\main.o</file>
-      <file>$TOOLKIT_DIR$\lib\shb_l.a</file>
-      <file>$PROJ_DIR$\Debug\Obj\uartstdio.pbi</file>
-      <file>$PROJ_DIR$\Debug\Obj\startup_ewarm.o</file>
-      <file>$TOOLKIT_DIR$\inc\stdarg.h</file>
-      <file>$TOOLKIT_DIR$\inc\Luminary\driverlib\uart.h</file>
-      <file>$TOOLKIT_DIR$\inc\Luminary\driverlib\rom.h</file>
-      <file>$PROJ_DIR$\main.c</file>
-      <file>$PROJ_DIR$\utils\uartstdio.c</file>
-      <file>$PROJ_DIR$\src\920_uart.c</file>
-      <file>$PROJ_DIR$\inc\driverlib\i2s.h</file>
-      <file>$PROJ_DIR$\src\radio.c</file>
-      <file>$PROJ_DIR$\Debug\Obj\adf4351.o</file>
-      <file>$PROJ_DIR$\Debug\Obj\adf4351.pbi</file>
-      <file>$PROJ_DIR$\src\adf4351.h</file>
-      <file>$PROJ_DIR$\src\adf4351.c</file>
     </outputs>
-    <file>
-      <name>[ROOT_NODE]</name>
-      <outputs>
-        <tool>
-          <name>ILINK</name>
-          <file> 60</file>
-        </tool>
-      </outputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\src\main.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 63</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 65</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 31 48 32 30 29 28 27 26 25 24 21 54 57 15 17 62 50 53 46 19 52 49 56 16 23 22 75 47 58 41</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 31 48 32 30 29 42 28 27 26 25 24 21 54 57 15 17 62 50 53 46 19 52 49 56 16 23 22 75 47 58 41</file>
-        </tool>
-      </inputs>
-    </file>
     <file>
       <name>$PROJ_DIR$\src\cmd_proc.c</name>
       <outputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 39</file>
+          <name>ICCARM</name>
+          <file> 18</file>
         </tool>
         <tool>
-          <name>ICCARM</name>
-          <file> 51</file>
+          <name>BICOMP</name>
+          <file> 72</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 37 31 48 32 30 29 28 27 26 25 24 21 54 57 15 17 62 50 53 46 19 52 49 56 16 23 22 75 47 58 41</file>
-        </tool>
-        <tool>
           <name>ICCARM</name>
-          <file> 37 31 48 32 30 29 42 28 27 26 25 24 21 54 57 15 17 62 50 53 46 19 52 49 56 16 23 22 75 47 58 41</file>
+          <file> 70 64 14 65 63 62 75 61 60 59 58 57 54 21 24 46 51 28 17 20 79 52 16 15 22 49 56 55 41 80 23 74 45</file>
         </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\src\my_uart.c</name>
-      <outputs>
         <tool>
           <name>BICOMP</name>
-          <file> 34</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 43</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 69 32 30 29 28 27 26 31 48 25 24 21 54 57 15 17 62 50 53 46 19 52 49 56 16 23 22 75 47 58 41</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 69 32 30 29 42 28 27 26 31 48 25 24 21 54 57 15 17 62 50 53 46 19 52 49 56 16 23 22 75 47 58 41</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\src\PLL.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 36</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 44</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 31 48 32 30 29 28 27 26 25 24 21 54 57 15 17 62 50 53 46 19 52 49 56 16 23 22 75 47 58 41</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 31 48 32 30 29 42 28 27 26 25 24 21 54 57 15 17 62 50 53 46 19 52 49 56 16 23 22 75 47 58 41</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\src\startup_ewarm.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 33</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 68</file>
-        </tool>
-      </outputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\Debug\Obj\video_mcu.pbd</name>
-      <inputs>
-        <tool>
-          <name>BILINK</name>
-          <file> 36 78 39 63 34 33</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\Debug\Exe\video_mcu.out</name>
-      <inputs>
-        <tool>
-          <name>ILINK</name>
-          <file> 55 44 77 51 65 43 68 1 66 61 64</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\main.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 63</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 65</file>
-        </tool>
-      </outputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\utils\uartstdio.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 67</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 13</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 69 32 30 29 28 27 26 14 4 8 7 6 5 71 2 19 70 3</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 69 32 30 29 42 28 27 26 14 4 8 7 6 5 71 2 19 70 3</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\src\920_uart.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 40</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 45</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 31 48 32 30 29 28 27 26 25 24 21 54 57 15 17 62 50 53 46 19 52 49 56 18 16 23 20 22 75 47</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 31 48 32 30 29 42 28 27 26 25 24 21 54 57 15 17 62 50 53 46 19 52 49 56 18 16 23 20 22 75 47</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\src\radio.c</name>
-      <outputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 35</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 38</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>BICOMP</name>
-          <file> 31 48 32 30 29 28 27 26 25 24 21 54 57 15 17 62 50 53 46 19 52 49 56 16 23 22 75 47 41</file>
-        </tool>
-        <tool>
-          <name>ICCARM</name>
-          <file> 31 48 32 30 29 42 28 27 26 25 24 21 54 57 15 17 62 50 53 46 19 52 49 56 16 23 22 75 47 41</file>
+          <file> 70 64 14 65 63 62 61 60 59 58 57 54 21 24 46 51 28 17 20 79 52 16 15 22 49 56 55 41 80 23 74 45</file>
         </tool>
       </inputs>
     </file>
@@ -306,22 +115,213 @@
       <name>$PROJ_DIR$\src\adf4351.c</name>
       <outputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 78</file>
+          <name>ICCARM</name>
+          <file> 42</file>
         </tool>
         <tool>
-          <name>ICCARM</name>
-          <file> 77</file>
+          <name>BICOMP</name>
+          <file> 44</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>BICOMP</name>
-          <file> 79 31 48 32 30 29 28 27 26 25 24 21 54 57 15 17 62 50 53 46 19 52 49 56 16 23 22 75 47 58 41</file>
+          <name>ICCARM</name>
+          <file> 45 64 14 65 63 62 75 61 60 59 58 57 54 21 24 46 51 28 17 20 79 52 16 15 22 49 56 55 41 80 23 74</file>
         </tool>
         <tool>
+          <name>BICOMP</name>
+          <file> 45 64 14 65 63 62 61 60 59 58 57 54 21 24 46 51 28 17 20 79 52 16 15 22 49 56 55 41 80 23 74</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\src\main.c</name>
+      <outputs>
+        <tool>
           <name>ICCARM</name>
-          <file> 79 31 48 32 30 29 42 28 27 26 25 24 21 54 57 15 17 62 50 53 46 19 52 49 56 16 23 22 75 47 58 41</file>
+          <file> 33</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 30</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 64 14 65 63 62 75 61 60 59 58 57 54 21 24 46 51 28 17 20 79 52 16 15 22 49 56 55 41 80 23 74 45</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 64 14 65 63 62 61 60 59 58 57 54 21 24 46 51 28 17 20 79 52 16 15 22 49 56 55 41 80 23 74 45</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\src\my_uart.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 76</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 67</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 35 65 63 62 75 61 60 59 64 14 58 57 54 21 24 46 51 28 17 20 79 52 16 15 22 49 56 55 41 80 23 74 45</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 35 65 63 62 61 60 59 64 14 58 57 54 21 24 46 51 28 17 20 79 52 16 15 22 49 56 55 41 80 23 74 45</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\src\PLL.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 77</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 69</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 64 14 65 63 62 75 61 60 59 58 57 54 21 24 46 51 28 17 20 79 52 16 15 22 49 56 55 41 80 23 74 45</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 64 14 65 63 62 61 60 59 58 57 54 21 24 46 51 28 17 20 79 52 16 15 22 49 56 55 41 80 23 74 45</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\src\startup_ewarm.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 34</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 66</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>[ROOT_NODE]</name>
+      <outputs>
+        <tool>
+          <name>ILINK</name>
+          <file> 25</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Debug\Exe\video_mcu.out</name>
+      <inputs>
+        <tool>
+          <name>ILINK</name>
+          <file> 19 77 42 18 33 76 34 1 32 27 29</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\Debug\Obj\video_mcu.pbd</name>
+      <inputs>
+        <tool>
+          <name>BILINK</name>
+          <file> 69 44 72 30 67 66</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\main.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 33</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 30</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\utils\uartstdio.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 48</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 31</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 35 65 63 62 75 61 60 59 47 7 3 4 6 5 37 2 52 36 8</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 35 65 63 62 61 60 59 47 7 3 4 6 5 37 2 52 36 8</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\src\920_uart.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 78</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 73</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 64 14 65 63 62 75 61 60 59 58 57 54 21 24 46 51 28 17 20 79 52 16 15 22 50 49 56 53 55 41 80</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 64 14 65 63 62 61 60 59 58 57 54 21 24 46 51 28 17 20 79 52 16 15 22 50 49 56 53 55 41 80</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\src\radio.c</name>
+      <outputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 71</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 68</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>ICCARM</name>
+          <file> 64 14 65 63 62 75 61 60 59 58 57 54 21 24 46 51 28 17 20 79 52 16 15 22 49 56 55 41 80 74</file>
+        </tool>
+        <tool>
+          <name>BICOMP</name>
+          <file> 64 14 65 63 62 61 60 59 58 57 54 21 24 46 51 28 17 20 79 52 16 15 22 49 56 55 41 80 74</file>
         </tool>
       </inputs>
     </file>

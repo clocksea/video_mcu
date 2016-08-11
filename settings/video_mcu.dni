@@ -33,7 +33,7 @@ TriggerName=main
 LimitSize=0
 ByteLimit=50
 [DebugChecksum]
-Checksum=195037578
+Checksum=1124857307
 [DisAssemblyWindow]
 NumStates=_ 1
 State 1=_ 0
@@ -54,14 +54,14 @@ LogFile=_ ""
 Enabled=0
 [DriverProfiling]
 Enabled=0
-Mode=1348422996
+Mode=131985440
 Graph=0
 Symbiont=0
 [Disassemble mode]
 mode=1
 [Breakpoints]
 Bp0=_ "STD_CODE" "{C:\Windows\system32}.192.1@1" 0 0 0 0 "" 0 "" 0
-Bp1=_ "STD_CODE" "{$PROJ_DIR$\src\cmd_proc.c}.101.2@1" 1 0 0 0 "" 0 "" 0
+Bp1=_ "STD_CODE" "{$PROJ_DIR$\src\cmd_proc.c}.103.2@1" 1 0 0 0 "" 0 "" 0
 Count=2
 [Aliases]
 A0=_ "D:\BaiduYunDownload\ÏîÄ¿\Èí¼þ\video\video_mcu\video_mcu\src\main.c" ""
