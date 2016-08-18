@@ -14,6 +14,20 @@ extern int32_t watchdog_cnt;
 extern pll_info_t pll_info[2];
 extern double cp_map[16];
 /*****************************/
+
+
+at_func_map_t at_func_map[]={
+		{"AT_SMFREQ","AT_SMFREQ=X,X为PLL1频率,单位KHz",proc_SMFREQ_cmd},
+		{"AT_SMPLLCP","AT_SMPLLCP=X,X为PLL泵电流值(0-15)",proc_SMPLLCP_cmd},
+		{"AT_SSFREQ","AT_SSFREQ=X,X为PLL2频率,单位KHz",proc_SSFREQ_cmd},
+		{"AT_RFCTRL","AT_RFCTRL=X,X为RF_CTRL脚控制电平,0-低,1-高",proc_RFCTRL_cmd},
+		{"AT_INFO","AT_INFO,打印单片机信息",proc_INFO_cmd},
+		{"AT_PLLINFO","AT_PLLINFO,打印PLL信息",proc_PLLINFO_cmd},
+		{NULL,NULL,NULL}
+};
+
+
+
 void init_software(void)
 {
 	init_ccu_buf();
@@ -149,7 +163,7 @@ void proc_SMPLLCP_cmd(char *buf, unsigned char len)
 {
 	uint32_t param[64];
 	uint32_t cnt=0;
-	char *cmd = buf + strlen("SMPLLCP=");
+	char *cmd = buf + strlen("AT_SMPLLCP=");
 
 	memset(param,0,sizeof(param));
 
@@ -196,7 +210,7 @@ void proc_SMFREQ_cmd(char *buf, unsigned char len)
 {
 	uint32_t param[64];
 	uint32_t cnt=0;
-	char *cmd = buf + strlen("SMFREQ=");
+	char *cmd = buf + strlen("AT_SMFREQ=");
 
 	memset(param,0,sizeof(param));
 
@@ -225,12 +239,12 @@ DONE:
 		myprintf("input error,%s\n\r",buf);
 		return;
 	}
-	if((param[0]<(MIN_FREQ_HZ/FREQ_1_MHZ)) || (param[0]>(MAX_FREQ_HZ/FREQ_1_MHZ)))
+	if((param[0]<(MIN_FREQ_HZ/FREQ_1_KHZ)) || (param[0]>(MAX_FREQ_HZ/FREQ_1_KHZ)))
 	{
 		myprintf("输入频率超出范围,%dHz\n\r",param[0]);
 		return;		
 	}
-	param[0] = param[0]*FREQ_1_MHZ;
+	param[0] = param[0]*FREQ_1_KHZ;
 	pll_info[0].rf_freq_hz = param[0]-MID_FREQ_HZ;
 	myprintf("主接收频率设置为%dHz,pll-1设置为:%dHz\n\r",param[0],pll_info[0].rf_freq_hz);
 	
@@ -245,7 +259,7 @@ void proc_PLLSET_cmd(char *buf, unsigned char len)
 {
 	uint32_t param[64];
 	uint32_t cnt=0;
-	char *cmd = buf + strlen("PLLSET=");
+	char *cmd = buf + strlen("AT_PLLSET=");
 
 	memset(param,0,sizeof(param));
 
@@ -321,11 +335,74 @@ void proc_PLLINFO_cmd(char *buf, unsigned char len)
 }
 
 
+void proc_RFCTRL_cmd(char *buf, unsigned char len)
+{
+	uint32_t param[64];
+	uint32_t cnt=0;
+	char *cmd = buf + strlen("AT_RFCTRL=");
+
+	memset(param,0,sizeof(param));
+
+	while(1)
+	{
+		while((*cmd != ',') && (*cmd != CR) && (*cmd != LF))
+		{
+			if((*cmd >'9')||(*cmd <'0'))
+			{
+				 myprintf("input error,%s\n\r",buf);
+				 return;
+			}
+			param[cnt] = 10*param[cnt]	+ *cmd++ - '0'; 	
+		}
+		cnt++;
+		if((*cmd == CR) || (*cmd == LF))
+		{
+			goto DONE;
+		}
+
+		cmd++;		
+	}
+DONE:
+	if(cnt > 1)
+	{
+		myprintf("input error,%s\n\r",buf);
+		return;
+	}
+
+	if(param[0] == 0)
+	{
+		CLR_RF_CTRL_1();
+		myprintf("RF_CTRL置为低\n\r");
+	}
+	else
+	{
+		SET_RF_CTRL_1();
+		myprintf("RF_CTRL置为高\n\r");
+	}
+
+}
+
+
+
 void proc_INFO_cmd(char *buf, unsigned char len)
 {
 	myprintf("-----------单片机信息如下-------------\r\n");
 	myprintf("软件版本:ver = %s\r\n",VER_INFO);
 	myprintf("         date = %s %s\r\n", __DATE__,__TIME__);	
+}
+
+void myhelp(void)
+{
+
+	uint32_t i=0;
+
+	myprintf("输入错误!!!\n\r");
+	while(at_func_map[i].func!=NULL)
+	{
+		myprintf("		%s\n\r",at_func_map[i++].info);
+	}
+	return;
+	
 }
 
 
@@ -345,6 +422,22 @@ void proc_AT_cmd(char *buf, unsigned char len)
 			return;
 		}
 	}
+#if 1
+	i=0;
+	while(at_func_map[i].func!=NULL)
+	{
+		if(0==strcmp(cmd,at_func_map[i].cmd))
+		{
+			at_func_map[i].func(buf,len);
+			return;
+		}
+		i++;
+	}
+
+	myhelp();
+	return;
+#endif
+#if 0	
 	if(0==strcmp(cmd,"SMFREQ"))
 	{
 		proc_SMFREQ_cmd(buf,len);
@@ -372,10 +465,18 @@ void proc_AT_cmd(char *buf, unsigned char len)
 	else if(0==strcmp(cmd,"SMPLLCP"))
 	{
 		proc_SMPLLCP_cmd(buf,len);
-	}		
+	}
+	else if(0==strcmp(cmd,"RFCTRL"))
+	{
+		proc_RFCTRL_cmd(buf,len);
+	}	
 	else
+	{
 		myprintf("Input error,%s\n\r",buf);
+	}
+	
 	return;
+#endif
 }
 
 void proc_uart_cmd(char *buf, unsigned char len)
@@ -398,6 +499,20 @@ void proc_uart_buf(uart_info_t *uart)
 		c = uart->ring_buf[uart->ring_head];
 		uart->ring_head = (uart->ring_head + 1) % sizeof(uart->ring_buf);
 
+		if (LF == c)
+		{
+			uart->com_rx_buf[uart->com_rx_sequence++] = c;
+			proc_uart_cmd(uart->com_rx_buf, uart->com_rx_sequence);
+			uart->com_rx_sequence=0;
+		}
+		else
+		{
+			uart->com_rx_buf[uart->com_rx_sequence++] = c;
+			if(uart->com_rx_sequence>=MAX_COMM_PACKSIZE)
+				uart->com_rx_sequence=0;
+		}
+
+#if 0		
 		switch(uart->stream_state)
 		{
 			case STATE_IDLE:
@@ -461,6 +576,7 @@ void proc_uart_buf(uart_info_t *uart)
 				uart->stream_state = STATE_IDLE;
 				break;
 		}
+#endif		
 	}
 }
 

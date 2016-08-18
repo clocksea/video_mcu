@@ -85,6 +85,9 @@ void uart0Init(void)
 //UART1初始化，调试串口
 void uart1Init(void)
 {   
+	unsigned long ulStatus;
+	unsigned char c;
+
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_UART1);            //使能UART1模块
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);            //使能RX/TX所在的GPIO端口
 	
@@ -107,6 +110,13 @@ void uart1Init(void)
 
 	IntPrioritySet(INT_UART1, 0<<5);                                 //设置UART1中断优先级为0
 	UARTIntEnable(UART1_BASE, UART_INT_TX | UART_INT_RX | UART_INT_RT);   //使能UART1的发送中断/接收中断/接收超时中断
+
+	ulStatus = UARTIntStatus(UART1_BASE, true);                 //读取中断状态
+    UARTIntClear(UART1_BASE, ulStatus);
+	while (UARTCharsAvail(UART1_BASE))                            //若接收FIFO中有可用数据
+	{
+		c = (unsigned char)UARTCharGetNonBlocking(UART1_BASE);	
+	}
 	
 	IntEnable(INT_UART1);                                                //使能UART1的中断
 	
@@ -165,10 +175,15 @@ void pll_gpio_init(void)
 
 	SysCtlPeripheralEnable(PLLDATA_PERIPH);						
 	GPIOPinTypeGPIOOutput(PLLDATA_PORT, PLLDATA_PIN); 
-	CLR_DATA();
+	CLR_DATA();	
 
+	SysCtlPeripheralEnable(RF_CTRL_1_PERIPH);						
+	GPIOPinTypeGPIOOutput(RF_CTRL_1_PORT, RF_CTRL_1_PIN); 
+	CLR_RF_CTRL_1();
 
-	
+	SysCtlPeripheralEnable(RF_CTRL_2_PERIPH);						
+	GPIOPinTypeGPIOOutput(RF_CTRL_2_PORT, RF_CTRL_2_PIN); 
+	CLR_RF_CTRL_2();	
 }
 
 
@@ -241,7 +256,7 @@ void timer1AIntHandler(void)
 	TimerIntClear(TIMER1_BASE, ulStatus);                            //清除中断状态
 	if (ulStatus & TIMER_TIMA_TIMEOUT)                               //timer0A超时中断
 	{
-		GPIOPinWrite(LED_PORT, LED_PIN, ~GPIOPinRead(LED_PORT, LED_PIN) ); 	
+		GPIOPinWrite(LED_PORT, LED_PIN, ~GPIOPinRead(LED_PORT, LED_PIN) );
 	}
 }
 

@@ -62,6 +62,16 @@
 #define  PLLPDBRF_1_PORT                GPIO_PORTB_BASE
 #define  PLLPDBRF_1_PIN                  GPIO_PIN_6
 
+#define  RF_CTRL_1_PERIPH             SYSCTL_PERIPH_GPIOB
+#define  RF_CTRL_1_PORT                GPIO_PORTB_BASE
+#define  RF_CTRL_1_PIN                  GPIO_PIN_4
+
+#define  RF_CTRL_2_PERIPH             SYSCTL_PERIPH_GPIOB
+#define  RF_CTRL_2_PORT                GPIO_PORTB_BASE
+#define  RF_CTRL_2_PIN                  GPIO_PIN_3
+
+
+
 
 #define SET_LE1()		GPIOPinWrite(PLLLE_1_PORT, PLLLE_1_PIN, PLLLE_1_PIN)
 #define CLR_LE1()		GPIOPinWrite(PLLLE_1_PORT, PLLLE_1_PIN, 0)
@@ -75,12 +85,19 @@
 #define SET_CE2()		GPIOPinWrite(PLLCE_2_PORT, PLLCE_2_PIN, PLLCE_2_PIN)	
 #define CLR_CE2()		GPIOPinWrite(PLLCE_2_PORT, PLLCE_2_PIN, 0)
 
+#define SET_RF_CTRL_1()	GPIOPinWrite(RF_CTRL_1_PORT, RF_CTRL_1_PIN, RF_CTRL_1_PIN)	
+#define CLR_RF_CTRL_1()	GPIOPinWrite(RF_CTRL_1_PORT, RF_CTRL_1_PIN, 0)
+
+#define SET_RF_CTRL_2()	GPIOPinWrite(RF_CTRL_2_PORT, RF_CTRL_2_PIN, RF_CTRL_2_PIN)	
+#define CLR_RF_CTRL_2()	GPIOPinWrite(RF_CTRL_2_PORT, RF_CTRL_2_PIN, 0)
+
 
 #define MID_FREQ_HZ		(480*1000*1000)/*480MHz*/
 
 #define MAX_FREQ_HZ		(2600*1000*1000)/*2600MHz*/
 #define MIN_FREQ_HZ		(800*1000*1000)/*800MHz*/
 #define FREQ_1_MHZ		(1000*1000)/*1MHZ*/
+#define FREQ_1_KHZ		(1000)/*1KHZ*/
 
 
 /*------------------------软件版本信息记录--------------*/
