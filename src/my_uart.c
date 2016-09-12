@@ -191,3 +191,25 @@ void myprintf(const char *pcString, ...)
 }
 
 
+void printf_to_android(const char *pcString, ...)
+{
+	char tmp[MAX_COMM_PACKSIZE];
+    va_list vaArgP;
+
+	memset(tmp,0,sizeof(tmp));
+    //
+    // Start the varargs processing.
+    //
+    va_start(vaArgP, pcString);	
+	
+	vsnprintf(tmp,sizeof(tmp), pcString, vaArgP);
+
+    //
+    // End the varargs processing.
+    //
+    va_end(vaArgP);	
+
+	uart_send_datas(UART0_BASE,&g_uart_comm,tmp);	
+}
+
+

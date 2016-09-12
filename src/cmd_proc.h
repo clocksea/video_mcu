@@ -94,6 +94,7 @@ extern void proc_uart_cmd(char *buf, unsigned char len);
 extern void proc_SMPLLCP_cmd(char *buf, unsigned char len);
 extern void proc_RFCTRL_cmd(char *buf, unsigned char len);
 extern void proc_PLLINFO_cmd(char *buf, unsigned char len);
+extern void proc_SCAN_cmd(char *buf, unsigned char len);
 extern void myhelp(void);
 #ifdef __cplusplus
 #if __cplusplus

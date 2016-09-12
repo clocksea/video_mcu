@@ -33,7 +33,7 @@ TriggerName=main
 LimitSize=0
 ByteLimit=50
 [DebugChecksum]
-Checksum=1548954658
+Checksum=-941814616
 [DisAssemblyWindow]
 NumStates=_ 1
 State 1=_ 0
@@ -43,6 +43,9 @@ Enabled=_ 0
 Enabled=_ 0
 [Profiling]
 Enabled=0
+[RegisterFilter]
+FilePath=_ ""
+UseFilter=_ 0
 [Log file]
 LoggingEnabled=_ 0
 LogFile=_ ""
@@ -61,7 +64,8 @@ Symbiont=0
 mode=1
 [Breakpoints]
 Bp0=_ "STD_CODE" "{C:\Windows\system32}.192.1@1" 0 0 0 0 "" 0 "" 0
-Count=1
+Bp1=_ "STD_CODE" "{$PROJ_DIR$\src\cmd_proc.c}.507.2@1" 1 0 0 0 "" 0 "" 0
+Count=2
 [Aliases]
 A0=_ "D:\BaiduYunDownload\ÏîÄ¿\Èí¼þ\video\video_mcu\video_mcu\src\main.c" ""
 Count=1

@@ -68,6 +68,13 @@ typedef struct{
 	uint32_t div;
 	uint32_t rf_freq_hz;
 	uint32_t cp_value;
+
+	uint32_t scan_span_hz;/*É¨Ãè´ø¿í*/
+	uint32_t scan_start_freq_hz;
+	uint32_t scan_stop_freq_hz;
+	uint32_t scan_cur_freq_hz;
+	uint32_t scan_status;
+	uint32_t scan_enable;
 	
 }pll_info_t;
 

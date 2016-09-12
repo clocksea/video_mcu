@@ -1,9 +1,4 @@
----- delay Matches (8 in 4 files) ----
-Hw_pwm.h (inc):#define PWM_RV_X_DBFALL         0x00000000  // The dead band falling edge delay
-Hw_pwm.h (inc):#define PWM_RV_X_DBRISE         0x00000000  // The dead band rising edge delay
-Main.c (src):	delay
-Softi2c.c (utils):        // Each of these states exists only to provide some timing delay in
-Softuart.c (utils):    // See if this is an edge interrupt while delaying for the receive timeout
-Softuart.c (utils):            // Advance to the receive timeout delay state.
-Softuart.c (utils):            // Advance to the receive timeout delay state.
-Softuart.c (utils):        // The state machine is in the receive timeout delay state.
+---- adc_init Matches (3 in 2 files) ----
+Cmd_proc.c (src):		adc_init();
+Main.c (src):void adc_init(void)
+Main.c (src):	adc_init();

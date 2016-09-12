@@ -129,6 +129,11 @@ void adf4351_reset_reg(pll_info_t *pll)
 void adf4351_init(uint32_t num,pll_info_t *pll)
 {
 	pll->num = num;
+	pll->scan_span_hz = 0;
+	pll->scan_cur_freq_hz=0;
+	pll->scan_start_freq_hz=0;
+	pll->scan_stop_freq_hz=0;
+	
 	adf4351_reset_reg(pll);
 	cfg_adf4351(pll);	
 }

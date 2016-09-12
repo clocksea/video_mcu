@@ -12,6 +12,11 @@ int	alarm_count;//alarm_status 发送次数
  
 int32_t watchdog_cnt=0;
 
+volatile int32_t g_adc_working_flag=0;/*adc正在采样标示*/
+long g_adc_sample_buffer[64]={0};
+int32_t g_adc_sample_idx=0;
+long g_adc_rssi[2]={0};
+
 
 uart_info_t  g_uart_dbg;/*调试串口*/
 uart_info_t  g_uart_comm;/*通信串口*/
@@ -75,7 +80,7 @@ void uart0Init(void)
 
 
 	IntPrioritySet(INT_UART0, 1<<5);                                 //设置UART0中断优先级为1
-	UARTIntEnable(UART0_BASE, UART_INT_RX | UART_INT_RT);   //使能UART0的接收中断和超时中断
+	UARTIntEnable(UART0_BASE, UART_INT_TX | UART_INT_RX | UART_INT_RT);   //使能UART0的接收中断和超时中断
 	
 	IntEnable(INT_UART0);                                                //使能UART0的中断
 
@@ -187,14 +192,21 @@ void pll_gpio_init(void)
 }
 
 
-
-
 void adcIntHandler(void)
-{	
-	unsigned long ulValue;
-	
-	while(ADCSequenceDataGet(ADC_BASE, 0, &ulValue));
-	
+{		
+	//while(1)
+	{
+		ADCSequenceDataGet(ADC_BASE, 0, &g_adc_sample_buffer[g_adc_sample_idx++]);
+		
+		if(g_adc_sample_idx>=64)
+		{
+			g_adc_working_flag = ADC_STAUTS_SAMPLE_DONE;
+		}
+		else
+			ADCProcessorTrigger(ADC_BASE, 0);
+		ADCIntClear(ADC_BASE, 0);
+	}
+
 }
 
 
@@ -205,19 +217,15 @@ void adc_init(void)
 {
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
 	//SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC1);
-	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);  
-	
+	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD); 
+		
 	GPIOPinTypeADC(GPIO_PORTD_BASE,GPIO_PIN_2); 
 	GPIOPinTypeADC(GPIO_PORTD_BASE,GPIO_PIN_4);
 
-	//
-	// Enable the first sample sequence to capture the value of channel 0 when
-	// the processor trigger occurs.
-	//
 	ADCHardwareOversampleConfigure(ADC_BASE,64);
 	ADCSequenceConfigure(ADC_BASE, 0, ADC_TRIGGER_PROCESSOR, 0);
 	ADCSequenceStepConfigure(ADC_BASE, 0, 0,
-	ADC_CTL_IE | ADC_CTL_END | ADC_CTL_CH7|ADC_CTL_CH13);
+	ADC_CTL_IE | ADC_CTL_END | /*ADC_CTL_CH7|*/ADC_CTL_CH13);
 	ADCSequenceEnable(ADC_BASE, 0);
 	
 	ADCIntRegister(ADC_BASE,0,adcIntHandler);
@@ -226,7 +234,7 @@ void adc_init(void)
 	//
 	// Trigger the sample sequence.
 	//
-	ADCProcessorTrigger(ADC_BASE, 0);
+	//ADCProcessorTrigger(ADC_BASE, 0);
 
 	
 
@@ -429,6 +437,7 @@ void WATCHDOGIntHandler(void)
 	ulStatus = WatchdogIntStatus(WATCHDOG0_BASE, true);                 //读取中断状态
 	WatchdogIntClear(WATCHDOG0_BASE);
 	WatchdogReloadSet(WATCHDOG0_BASE,0xFEEFEE);
+	
 	GPIOPinWrite(LED_PORT, LED_PIN, ~GPIOPinRead(LED_PORT, LED_PIN) ); 
 
 	watchdog_cnt++;
@@ -459,9 +468,10 @@ void main(void)
 
 	clockInit();
 	led_init();
-	timer1Init();
+	//timer1Init();
 	uart0Init();
 	uart1Init();
+	adc_init();
 
 	init_uart_info(&g_uart_comm);
 	init_uart_info(&g_uart_dbg);
@@ -469,15 +479,21 @@ void main(void)
 	//iis_init();
 	//ssi0_init();
 	pll_gpio_init();
+
+	watchdog_init();
 	
 	IntMasterEnable();  
 
 	adf4351_init(1,&pll_info[0]);
+
+	printf_to_android("AT_START_RUN\r\n");
 	
 	while(1)
 	{
 		proc_uart_buf(&g_uart_comm);
 		proc_uart_buf(&g_uart_dbg);
+		pll_scan_proc(&pll_info[0]);
+		pll_scan_proc(&pll_info[1]);
 	}
 }
 

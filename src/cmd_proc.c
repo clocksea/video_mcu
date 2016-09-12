@@ -13,6 +13,10 @@ extern radio_param_t radio_param;
 extern int32_t watchdog_cnt;
 extern pll_info_t pll_info[2];
 extern double cp_map[16];
+extern long g_adc_sample_buffer[64];
+extern int32_t g_adc_sample_idx;
+extern long g_adc_rssi[2];
+extern volatile int32_t g_adc_working_flag;
 /*****************************/
 
 
@@ -23,6 +27,7 @@ at_func_map_t at_func_map[]={
 		{"AT_RFCTRL","AT_RFCTRL=X,X为RF_CTRL脚控制电平,0-低,1-高",proc_RFCTRL_cmd},
 		{"AT_INFO","AT_INFO,打印单片机信息",proc_INFO_cmd},
 		{"AT_PLLINFO","AT_PLLINFO,打印PLL信息",proc_PLLINFO_cmd},
+		{"AT_SCAN","AT_SCAN=f1,f2,fs,其中f1为扫描开始频率,f2为扫描结束频率,fs为扫描间隔,单位KHz",proc_SCAN_cmd},
 		{NULL,NULL,NULL}
 };
 
@@ -349,7 +354,7 @@ void proc_RFCTRL_cmd(char *buf, unsigned char len)
 		{
 			if((*cmd >'9')||(*cmd <'0'))
 			{
-				 myprintf("input error,%s\n\r",buf);
+				 myprintf("input error,%s\r\n",buf);
 				 return;
 			}
 			param[cnt] = 10*param[cnt]	+ *cmd++ - '0'; 	
@@ -365,21 +370,86 @@ void proc_RFCTRL_cmd(char *buf, unsigned char len)
 DONE:
 	if(cnt > 1)
 	{
-		myprintf("input error,%s\n\r",buf);
+		myprintf("input error,%s\r\n",buf);
 		return;
 	}
 
 	if(param[0] == 0)
 	{
 		CLR_RF_CTRL_1();
-		myprintf("RF_CTRL置为低\n\r");
+		myprintf("RF_CTRL置为低\r\n");
 	}
 	else
 	{
 		SET_RF_CTRL_1();
-		myprintf("RF_CTRL置为高\n\r");
+		myprintf("RF_CTRL置为高\r\n");
 	}
 
+}
+
+
+void proc_SCAN_cmd(char *buf, unsigned char len)
+{
+	uint32_t param[64];
+	uint32_t cnt=0;
+	char *cmd = buf + strlen("AT_SCAN=");
+
+	memset(param,0,sizeof(param));
+
+	while(1)
+	{
+		while((*cmd != ',') && (*cmd != CR) && (*cmd != LF))
+		{
+	        if((*cmd >'9')||(*cmd <'0'))
+			{
+				 myprintf("input error,%s\r\n",buf);
+				 return;
+			}
+	        param[cnt] = 10*param[cnt]  + *cmd++ - '0'; 	
+		}
+		cnt++;
+		if((*cmd == CR) || (*cmd == LF))
+		{
+			goto DONE;
+		}
+
+		cmd++;		
+	}
+DONE:
+	if(cnt > 3)
+	{
+		myprintf("input error,%s\r\n",buf);
+		return;
+	}
+	if((param[0]<(MIN_FREQ_HZ/FREQ_1_KHZ)) || (param[0]>(MAX_FREQ_HZ/FREQ_1_KHZ)))
+	{
+		myprintf("输入扫描起始频率超出范围,%dKHz\r\n",param[0]);
+		return;		
+	}
+	if((param[1]<(MIN_FREQ_HZ/FREQ_1_KHZ)) || (param[1]>(MAX_FREQ_HZ/FREQ_1_KHZ)))
+	{
+		myprintf("输入扫描结束频率超出范围,%dKHz\r\n",param[1]);
+		return;		
+	}
+	if(param[0]>param[1])
+	{
+		myprintf("输入扫描频率错误,%d-%dKHz\r\n",param[0],param[1]);
+		return;			
+	}
+
+	
+	/*先使用PLL0扫描*/
+	pll_info[0].scan_start_freq_hz = param[0]*FREQ_1_KHZ;
+	pll_info[0].scan_stop_freq_hz = param[1]*FREQ_1_KHZ;
+	pll_info[0].scan_span_hz = param[2]*FREQ_1_KHZ;
+	
+	myprintf("主pll-1扫描参数设置为:%dHz-%dHz,span:%dHz,将开始扫描\r\n",pll_info[0].scan_start_freq_hz,
+				pll_info[0].scan_stop_freq_hz,pll_info[0].scan_span_hz);
+
+	pll_info[0].scan_cur_freq_hz = 0;
+	pll_info[0].scan_status=SCAN_STATUS_IDLE;
+	pll_info[0].scan_enable=1;
+	
 }
 
 
@@ -389,6 +459,7 @@ void proc_INFO_cmd(char *buf, unsigned char len)
 	myprintf("-----------单片机信息如下-------------\r\n");
 	myprintf("软件版本:ver = %s\r\n",VER_INFO);
 	myprintf("         date = %s %s\r\n", __DATE__,__TIME__);	
+	myprintf("         watchdog_cnt = %d\r\n", watchdog_cnt);
 }
 
 void myhelp(void)
@@ -399,7 +470,7 @@ void myhelp(void)
 	myprintf("输入错误!!!\n\r");
 	while(at_func_map[i].func!=NULL)
 	{
-		myprintf("		%s\n\r",at_func_map[i++].info);
+		myprintf("		%s\r\n",at_func_map[i++].info);
 	}
 	return;
 	
@@ -418,7 +489,7 @@ void proc_AT_cmd(char *buf, unsigned char len)
 		i++;
 		if(i>sizeof(cmd))
 		{
-			myprintf("cmd too long,%s\n\r",buf);
+			myprintf("cmd too long,%s\r\n",buf);
 			return;
 		}
 	}
@@ -432,6 +503,11 @@ void proc_AT_cmd(char *buf, unsigned char len)
 			return;
 		}
 		i++;
+	}
+	if(0==strcmp(cmd,"killme"))
+	{
+		*(uint16_t *)0x100=100;
+		return;
 	}
 
 	myhelp();
@@ -580,6 +656,104 @@ void proc_uart_buf(uart_info_t *uart)
 	}
 }
 
+void proc_adc_sample_result(void)
+{
+	int32_t i;
+
+	g_adc_rssi[0]=0;
+	for(i=0;i<g_adc_sample_idx;i++)
+	{
+		g_adc_rssi[0] += g_adc_sample_buffer[i];
+	}
+	g_adc_rssi[0] /= g_adc_sample_idx;
+	
+	return;
+}
+
+void init_adc_info(void)
+{
+	g_adc_rssi[0]=0;
+	g_adc_rssi[1]=0;
+	g_adc_sample_idx=0;
+	g_adc_working_flag = ADC_STAUTS_IDLE;
+}
+
+void pll_scan_proc_in_idle_status(pll_info_t *pll_info)
+{
+	if(pll_info->scan_cur_freq_hz==0)
+	{
+		pll_info->scan_cur_freq_hz = pll_info->scan_start_freq_hz;
+		printf_to_android("AT_SCAN_START\r\n");
+	}
+	else
+	{
+		pll_info->scan_cur_freq_hz += pll_info->scan_span_hz;
+		if(pll_info->scan_cur_freq_hz>pll_info->scan_stop_freq_hz)
+			pll_info->scan_cur_freq_hz=pll_info->scan_start_freq_hz;
+	}
+	pll_info->rf_freq_hz = pll_info->scan_cur_freq_hz-MID_FREQ_HZ;
+	myprintf("主接收频率设置为%dHz,pll-1设置为:%dHz\n\r",pll_info->scan_cur_freq_hz,pll_info[0].rf_freq_hz);
+	rf_out(pll_info);
+	pll_info->scan_status = SCAN_STATUS_WAITTING_PLLLOCK;
+	return;
+}
+
+void pll_scan_proc_in_waitting_plllock_status(pll_info_t *pll_info)
+{
+	if(g_adc_working_flag == ADC_STAUTS_IDLE)
+	{
+		g_adc_working_flag=ADC_STAUTS_SAMPLING;
+		ADCProcessorTrigger(ADC_BASE, 0);
+		pll_info->scan_status = SCAN_STATUS_READING_RSSI;
+	}
+	return;	
+}
+
+void pll_scan_proc_in_reading_rssi_status(pll_info_t *pll_info)
+{
+	if(g_adc_working_flag == ADC_STAUTS_SAMPLE_DONE)
+	{
+		proc_adc_sample_result();
+		printf_to_android("AT_RSSI=%d,%d,%d\r\n",pll_info->num,pll_info->scan_cur_freq_hz/FREQ_1_KHZ,g_adc_rssi[pll_info->num-1]);
+		myprintf("AT_RSSI=%d,%d,%d\r\n",pll_info->num,pll_info->scan_cur_freq_hz/FREQ_1_KHZ,g_adc_rssi[pll_info->num-1]);
+		init_adc_info();
+
+		if((pll_info->scan_cur_freq_hz+pll_info->scan_span_hz)>pll_info->scan_stop_freq_hz)
+		{
+			printf_to_android("AT_SCAN_STOP\r\n");
+			pll_info->scan_enable=0;		
+		}
+		pll_info->scan_status = SCAN_STATUS_IDLE;
+	}
+	return;
+}
+
+
+void pll_scan_proc(pll_info_t *pll_info)
+{
+	if(pll_info->scan_enable==0)
+		return;
+
+
+	switch(pll_info->scan_status)
+	{
+		case SCAN_STATUS_IDLE:
+			pll_scan_proc_in_idle_status(pll_info);
+			break;
+		case SCAN_STATUS_WAITTING_PLLLOCK:
+			pll_scan_proc_in_waitting_plllock_status(pll_info);
+			break;
+		case SCAN_STATUS_READING_RSSI:
+			pll_scan_proc_in_reading_rssi_status(pll_info);
+			break;
+		default:
+			pll_info->scan_status=SCAN_STATUS_IDLE;
+			pll_info->scan_enable=1;
+			break;
+	}
+	
+	
+}
 
 
 

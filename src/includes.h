@@ -100,13 +100,25 @@
 #define FREQ_1_KHZ		(1000)/*1KHZ*/
 
 
+#define SCAN_STATUS_IDLE (0)
+#define SCAN_STATUS_WAITTING_PLLLOCK (1)
+#define SCAN_STATUS_READING_RSSI (2)
+
+#define ADC_STAUTS_IDLE (0)
+#define ADC_STAUTS_SAMPLING (1)
+#define ADC_STAUTS_SAMPLE_DONE (2)
+
+
+
+
 /*------------------------软件版本信息记录--------------*/
 /*
 V1.0.0 add by zhongh 2016-7-30
 	a.初始版本
-
+V1.1.0 add by zhongh 2016-9-12
+	a.扫描基本OK
 */
-#define VER_INFO "V1.0.0"
+#define VER_INFO "V1.1.0"
 
 
 
