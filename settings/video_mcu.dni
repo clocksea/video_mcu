@@ -33,7 +33,7 @@ TriggerName=main
 LimitSize=0
 ByteLimit=50
 [DebugChecksum]
-Checksum=-941814616
+Checksum=-2044042603
 [DisAssemblyWindow]
 NumStates=_ 1
 State 1=_ 0
@@ -57,7 +57,7 @@ LogFile=_ ""
 Enabled=0
 [DriverProfiling]
 Enabled=0
-Mode=0
+Mode=860902239
 Graph=0
 Symbiont=0
 [Disassemble mode]

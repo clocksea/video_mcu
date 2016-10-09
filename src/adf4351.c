@@ -273,6 +273,24 @@ void rf_out(pll_info_t *pll)
 	pll->mod_value = mod_value;
 
 	cfg_adf4351(pll);
+
+
+	if(pll->num==1)
+	{
+		if((pll->rf_freq_hz + MID_FREQ_HZ)<(FREQ_1_MHZ*1800))
+			CLR_RF_CTRL_1();
+		else
+			SET_RF_CTRL_1();
+	}
+	else
+	{
+		if((pll->rf_freq_hz + MID_FREQ_HZ)<(FREQ_1_MHZ*1800))
+			CLR_RF_CTRL_2();
+		else
+			SET_RF_CTRL_2();		
+	}
+	
+	
 }
 
 

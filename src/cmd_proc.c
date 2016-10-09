@@ -251,7 +251,7 @@ DONE:
 	}
 	param[0] = param[0]*FREQ_1_KHZ;
 	pll_info[0].rf_freq_hz = param[0]-MID_FREQ_HZ;
-	myprintf("主接收频率设置为%dHz,pll-1设置为:%dHz\n\r",param[0],pll_info[0].rf_freq_hz);
+	myprintf("主接收频率设置为%uHz,pll-1设置为:%uHz\n\r",param[0],pll_info[0].rf_freq_hz);
 	
 	rf_out(&pll_info[0]);
 }
