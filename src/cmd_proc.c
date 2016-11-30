@@ -689,7 +689,21 @@ void pll_scan_proc_in_idle_status(pll_info_t *pll_info)
 	{
 		pll_info->scan_cur_freq_hz += pll_info->scan_span_hz;
 		if(pll_info->scan_cur_freq_hz>pll_info->scan_stop_freq_hz)
-			pll_info->scan_cur_freq_hz=pll_info->scan_start_freq_hz;
+		{
+			pll_info->scan_cur_freq_hz=pll_info->scan_stop_freq_hz;
+		}
+		else
+		{
+			while((BAND1_STOP_FREQ_HZ<pll_info->scan_cur_freq_hz) && (pll_info->scan_cur_freq_hz<BAND2_START_FREQ_HZ))
+			{
+				pll_info->scan_cur_freq_hz += pll_info->scan_span_hz;
+				if(pll_info->scan_cur_freq_hz>pll_info->scan_stop_freq_hz)
+				{
+					pll_info->scan_cur_freq_hz=pll_info->scan_stop_freq_hz;
+					break;
+				}
+			}
+		}
 	}
 	pll_info->rf_freq_hz = pll_info->scan_cur_freq_hz-MID_FREQ_HZ;
 	myprintf("主接收频率设置为%dHz,pll-1设置为:%dHz\n\r",pll_info->scan_cur_freq_hz,pll_info[0].rf_freq_hz);
